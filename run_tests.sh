@@ -2,7 +2,7 @@
 
 mkdir allTests
 pushd allTests > /dev/null
-../tools/mk_classpath.sh
+../etc/mk_classpath.sh
 
 java \
    -cp classes/java/test:classes/kotlin/test:resources/test:./* \
