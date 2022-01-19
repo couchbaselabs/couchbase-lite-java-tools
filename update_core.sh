@@ -3,6 +3,9 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/.."
 
+NEXUS_URL="http://nexus.build.couchbase.com:8081/nexus/content/repositories/releases/com/couchbase/litecore"
+
+
 function usage() {
     echo "Usage: $0 <core commit> <ee commit>"
     exit 1
@@ -93,10 +96,8 @@ fi
 echo "=== Fetch"
 cd ..
 rm -rf common/lite-core
-# we used to build it...
-# common/tools/build_litecore.sh -e EE
-common/tools/fetch_litecore.sh -e EE -n "http://nexus.build.couchbase.com:8081/nexus/content/repositories/releases/com/couchbase/litecore"
-common/tools/build_litecore.sh -l mbedcrypto -e EE
+common/tools/fetch_litecore.sh -e EE -n "${NEXUS_URL}"
+common/tools/fetch_android_litecore.sh -e EE -n "${NEXUS_URL}"
 
 popd > /dev/null
 

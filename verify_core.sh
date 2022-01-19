@@ -40,6 +40,11 @@ for OS in macosx windows-win64; do
    test_core "${OS}" "EE" "${EE_SHA}" "zip"
 done
 
+for ABI in armeabi-v7a arm64-v8a x86 x86_64; do
+   test_core "android-${ABI}" "CE" "${CE_SHA}" "zip"
+   test_core "android-${ABI}" "EE" "${EE_SHA}" "zip"
+done
+
 popd > /dev/null
 rm -rf .core-tmp
 
