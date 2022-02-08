@@ -166,6 +166,9 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                                 // Run the build
                                 sh '''#!/bin/bash
+export JAVA_HOME="/usr/local/opt/java11"
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 echo "======== OSX: Environment"
@@ -279,9 +282,13 @@ SET PATH=%WORKSPACE%\\java-11.0.3\\bin;%PATH%
 
 cd %BUILD_DIR% || goto error
 
+echo "======== Windows: Environment"
+javac -version
+set
+
 echo ""> local.properties
 
-echo ======== Windows: Building in %BUILD_DIR%
+echo ======== Windows: Build in %BUILD_DIR%
 call %BUILD_DIR%\\etc\\jenkins\\build_windows.bat 2017 %BLD_NUM% || goto error
 
 goto :eof
