@@ -289,7 +289,7 @@ set
 echo ""> local.properties
 
 echo ======== Windows: Build in %BUILD_DIR%
-call %BUILD_DIR%\\etc\\jenkins\\build_windows.bat 2017 %BLD_NUM% || goto error
+powershell.exe -ExecutionPolicy Bypass -Command "%BUILD_DIR%\\etc\\jenkins\\build_windows.ps1" 2017 %BLD_NUM% || goto error
 
 goto :eof
 
@@ -320,7 +320,7 @@ echo maven.repo.pass=%MAVEN_REPO_PSW%>> local.properties
 
 echo ======== Windows: Publish
 mkdir %WORKSPACE%\\artifacts
-call %BUILD_DIR%\\etc\\jenkins\\publish_windows.bat %VERSION% %BLD_NUM% %WORKSPACE%\\artifacts || goto error
+powershell.exe -ExecutionPolicy Bypass -Command "%BUILD_DIR%\\etc\\jenkins\\publish_windows.ps1" %VERSION% %BLD_NUM% %WORKSPACE%\\artifacts || goto error
 
 goto :eof
 
@@ -538,7 +538,9 @@ echo ""> local.properties
 
 echo ======== Windows: Test
 mkdir %WORKSPACE%\\reports
-call %BUILD_DIR%\\etc\\jenkins\\test_windows.bat %BLD_NUM% %WORKSPACE%\\reports || exit 5
+
+powershell.exe -ExecutionPolicy Bypass -Command "%BUILD_DIR%\\etc\\jenkins\\test_windows.ps1" %BLD_NUM% %WORKSPACE%\\reports || exit 5
+
 
 goto :eof
 
