@@ -16,15 +16,6 @@ def static windowsNode(version) {
     }
 }
 
-def static linuxNode(distro) {
-    switch (distro) {
-        case "centos7":
-            return "cbl-java&&centos73"
-        case "centos6":
-            return "cbl-java&&centos6-gcc"
-    }
-}
-
 // check for pre- or post lithium build
 static boolean isNewWorkspace(version) {
     String[] v = version.split("\\.")
@@ -58,7 +49,7 @@ static String pwd(credentials) { return credentials.split(":")[1] }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pipeline {
-    agent { label linuxNode("${DISTRO}") }
+    agent { label "cbl-java&&centos73" }
     environment {
         LATESTBUILDS = "http://latestbuilds.service.couchbase.com/builds/latestbuilds"
         SOURCE = "couchbase-lite-java-${VERSION}-${BLD_NUM}-source.tar.gz"
@@ -87,16 +78,6 @@ pipeline {
                 // Clean the workspace
                 cleanWs(deleteDirs: true)
 
-                // Install Java 11 on Centos 6
-                script {
-                    // use cbdep to install jdk 11 on centos6:
-                    // rebuilding the centos6 docker image is too much of hack.
-                    // there's already a jdk 11 on the ubuntu18 image so no need to download it there.
-                    if ("${DISTRO}".toString() == "centos6") {
-                        sh '''cbdep install -d "${WORKSPACE}" java 11.0.3'''
-                    }
-                }
-
                 // Download the source
                 sh '''#!/bin/bash
 echo "======== Linux: Download source: ${SOURCE}"
@@ -112,11 +93,6 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                 // Run checks
                 sh '''#!/bin/bash
-if [[ "${DISTRO}" == "centos6" ]]; then
-    export JAVA_HOME="${WORKSPACE}/java-11.0.3"
-    export PATH="${JAVA_HOME}/bin:$PATH"
-fi
-
 cd "${BUILD_DIR}"
 
 touch "local.properties"
@@ -366,11 +342,6 @@ exit /b %ERRORLEVEL%
         stage('Linux: Build') {
             steps {
                 sh '''#!/bin/bash
-if [[ "${DISTRO}" == "centos6" ]]; then
-    export JAVA_HOME="${WORKSPACE}/java-11.0.3"
-    export PATH="${JAVA_HOME}/bin:$PATH"
-fi
-
 cd "${BUILD_DIR}"
 
 echo "======== Linux: Build in `pwd`"
@@ -389,11 +360,6 @@ echo "======== Linux: Build in `pwd`"
                 }
 
                 sh '''#!/bin/bash
-if [[ "${DISTRO}" == "centos6" ]]; then
-    export JAVA_HOME="${WORKSPACE}/java-11.0.3"
-    export PATH="${JAVA_HOME}/bin:$PATH"
-fi
-
 cd "${BUILD_DIR}"
 
 echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
@@ -591,11 +557,6 @@ exit /b %ERRORLEVEL%
                 // Run the tests
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
-if [[ "${DISTRO}" == "centos6" ]]; then
-    export JAVA_HOME="${WORKSPACE}/java-11.0.3"
-    export PATH="${JAVA_HOME}/bin:$PATH"
-fi
-
 cd "${BUILD_DIR}"
 
 echo "======== Linux: Test in `pwd`"
@@ -646,11 +607,6 @@ mkdir -p "${REPORTS_DIR}"
                 // Publish to Maven
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
-if [[ "${DISTRO}" == "centos6" ]]; then
-    export JAVA_HOME="${WORKSPACE}/java-11.0.3"
-    export PATH="${JAVA_HOME}/bin:$PATH"
-fi
-
 cd "${BUILD_DIR}"
 
 ARTIFACTS_DIR="$WORKSPACE/artifacts"

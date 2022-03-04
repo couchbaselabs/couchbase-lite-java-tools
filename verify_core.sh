@@ -32,8 +32,8 @@ echo -n "EE SHA: "
 "${TOOLS_DIR}/litecore_sha.sh" -e EE -o .core-sha
 EE_SHA=`cat .core-sha`
 
-test_core "centos6" "CE" "${CE_SHA}" "tar.gz"
-test_core "centos6" "EE" "${EE_SHA}" "tar.gz"
+test_core "linux" "CE" "${CE_SHA}" "tar.gz"
+test_core "linux" "EE" "${EE_SHA}" "tar.gz"
 
 for OS in macosx windows-win64; do
    test_core "${OS}" "CE" "${CE_SHA}" "zip"
