@@ -102,7 +102,7 @@ javac -version
 env | sort
 
 echo "======== Linux: Check in `pwd`"
-./etc/jenkins/check.sh ${BLD_NUM} ${DISTRO} || exit $?
+./etc/jenkins/check.sh ${BLD_NUM} || exit $?
 '''
             }
         }
@@ -345,7 +345,7 @@ exit /b %ERRORLEVEL%
 cd "${BUILD_DIR}"
 
 echo "======== Linux: Build in `pwd`"
-./etc/jenkins/build_linux.sh "${VERSION}" "${BLD_NUM}" "${WORKSPACE}" "${DISTRO}" || exit $?
+./etc/jenkins/build_linux.sh "${VERSION}" "${BLD_NUM}" "${WORKSPACE}" || exit $?
 '''
             }
         }
