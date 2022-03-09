@@ -29,14 +29,14 @@ test_core() {
 
 if [ "$#" -ne 2 ]; then usage; fi
 
-CORE_ID="$1"
+CORE_ID=`echo "$1" | tr '[:upper:]' '[:lower:]'`
 if [ -z "$CORE_ID" ]; then usage; fi
 
 CORE_EE_ID="$2"
 if [ -z "$CORE_EE_ID" ]; then usage; fi
 
 CORE_EE_ID=`echo -n "${CORE_ID}${CORE_EE_ID}" | shasum -a 1`
-CORE_EE_ID=${CORE_EE_ID:0:40}
+CORE_EE_ID=`echo "${CORE_EE_ID:0:40}" | tr '[:upper:]' '[:lower:]'`
 
 rm -rf .core-tmp
 mkdir .core-tmp
@@ -68,6 +68,6 @@ echo "EE: $CORE_EE_ID" >> "${ROOT_DIR}/core_version.txt"
 
 "${SCRIPT_DIR}/get_core.sh" "${NEXUS_URL}"
 
-echo "==== Core updated!"
+echo "==== Core updated.  Please run 'gw devTest' ASAP!"
 cat "${ROOT_DIR}/core_version.txt"
 
