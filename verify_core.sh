@@ -30,12 +30,12 @@ CE_COMMIT=$1
 if [ -z "${CE_COMMIT}" ]; then usage; fi
 
 EE_COMMIT=$2
-if [ -z $EE_COMMIT ]; then usage; fi
+if [ -z "${EE_COMMIT}" ]; then usage; fi
 
 # calculate the artifact IDs
 CE_ID=$CE_COMMIT
-EE_ID=`echo -n ="${CE_COMMIT}${EE_COMMIT}" | shasum -a 1`
-EE_ID=${EE_ID:0:40}
+EE_ID=`echo -n "${CE_COMMIT}${EE_COMMIT}" | shasum -a 1`
+EE_ID="${EE_ID:0:40}"
 
 rm -rf .core-tmp
 mkdir .core-tmp
