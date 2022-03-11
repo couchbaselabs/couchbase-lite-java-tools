@@ -106,6 +106,14 @@ echo "======== Linux: Check in `pwd`"
 '''
             }
         }
+        stage('Test python fetch: linux') {
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                sh '''#!/bin/bash
+cd "${BUILD_DIR}"
+python3 "${CBL_ROOT}/core/scripts/fetch_litecore.py" -x "${CBL_ROOT}/etc" --ce "${CBL_ROOT}/core" --ee "${CBL_ROOT}/couchbase-lite-core-EE" -v linux -o "${CBL_ROOT}/common//lite_core"
+'''
+            }
+        }
 
         stage('Platform Builds') {
             parallel {
@@ -205,6 +213,14 @@ mkdir -p "${ARTIFACTS_DIR}"
                                         ]
                                     )
                                 }
+                            }
+                        }
+                        stage('Test python fetch: macosx') {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                sh '''#!/bin/bash
+cd "${BUILD_DIR}"
+python3 "${CBL_ROOT}/core/scripts/fetch_litecore.py" -x "${CBL_ROOT}/etc" --ce "${CBL_ROOT}/core" --ee "${CBL_ROOT}/couchbase-lite-core-EE" -v macosx -o "${CBL_ROOT}/common//lite_core"
+'''
                             }
                         }
                     }
@@ -329,6 +345,14 @@ exit /b %ERRORLEVEL%
                                 }
                             }
                         }
+                        stage('Test python fetch: windows') {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                sh '''#!/bin/bash
+cd "${BUILD_DIR}"
+python3 "${CBL_ROOT}/core/scripts/fetch_litecore.py" -x "${CBL_ROOT}/etc" --ce "${CBL_ROOT}/core" --ee "${CBL_ROOT}/couchbase-lite-core-EE" -v macosx -o "${CBL_ROOT}/common//lite_core"
+'''
+                            }
+                        }
                     }
                 }
             }
@@ -338,6 +362,14 @@ exit /b %ERRORLEVEL%
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////   L I N U X   B U I L D   //////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        stage('Test python fetch: java') {
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                sh '''#!/bin/bash
+cd "${BUILD_DIR}"
+python3 "${CBL_ROOT}/core/scripts/fetch_litecore.py" -x "${CBL_ROOT}/etc" --ce "${CBL_ROOT}/core" --ee "${CBL_ROOT}/couchbase-lite-core-EE" -v java -o "${CBL_ROOT}/common//lite_core"
+'''         
+            }
+        }
 
         stage('Linux: Build') {
             steps {
