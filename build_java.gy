@@ -352,9 +352,9 @@ exit /b %ERRORLEVEL%
                         stage('Test python fetch: windows') {
                             steps {
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                    sh '''#!/bin/bash
+                                    bat '''
 cd "${BUILD_DIR}"
-python3 "${CBL_ROOT}/core/scripts/fetch_litecore.py" -x "${CBL_ROOT}/etc" --ce "${CBL_ROOT}/core" --ee "${CBL_ROOT}/couchbase-lite-core-EE" -v macosx -o "${CBL_ROOT}/common//lite_core"
+python3 "%CBL_ROOT%\\core\\scripts\\fetch_litecore.py" -x "%CBL_ROOT%\\etc" --ce "%CBL_ROOT%\\core" --ee "%CBL_ROOT%\\couchbase-lite-core-EE" -v macosx -o "%CBL_ROOT%\\common\\lite_core"
 '''
                                 }
                             }
