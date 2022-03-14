@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NEXUS_URL="http://nexus.build.couchbase.com:8081/nexus/content/repositories/releases/com/couchbase/litecore"
+LATESTBUILDS_CORE="http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-core/sha"
 STATUS=0
 
 function usage() {
@@ -14,7 +14,7 @@ test_core() {
    ID=$3
    SUFFIX=$4
    echo -n "${OS} ${EDITION}: "
-   curl -I -s -f -o /dev/null "${NEXUS_URL}/couchbase-litecore-${OS}/${ID}/couchbase-litecore-${OS}-${ID}.${SUFFIX}" -o "${OS}-${EDITION}.${SUFFIX}"
+   curl -I -s -f -o /dev/null "${LATESTBUILDS_CORE}/${ID:0:2}/${ID}/couchbase-lite-core-${OS}.${SUFFIX}" -o "litecore-${OS}-${EDITION}-${ID}.${SUFFIX}"
    if [ $? -eq 0 ]; then
       echo "Succeeded"
    else
