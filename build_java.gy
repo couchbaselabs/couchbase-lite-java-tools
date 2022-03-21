@@ -229,8 +229,8 @@ mkdir -p "${ARTIFACTS_DIR}"
 
                                 // Install Java 11
                                 powershell '''
-Invoke-webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-.\cbdep.exe install -d $WORKSPACE java 11.0.3
+Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
+./cbdep.exe install -d $WORKSPACE java 11.0.3
 '''
 
                                 // Download the source
@@ -501,7 +501,7 @@ mkdir -p "${REPORTS_DIR}"
                                 // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-.\cbdep.exe install -d $WORKSPACE java 11.0.3
+./cbdep.exe install -d $WORKSPACE java 11.0.3
 
                                 // Download the source
                                 powershell '''
