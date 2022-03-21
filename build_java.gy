@@ -243,7 +243,7 @@ try {
 }
 catch {
     Write-Host "Failed with error" $LASTEXITCODE
-    exit $LASTEXITCODE
+    Exit $LASTEXITCODE
 }
 
 Write-Host "======== Windows: Extract source"
@@ -253,7 +253,7 @@ try {
 }
 catch {
     Write-Host "Failed with error" $LASTEXITCODE
-    exit $LASTEXITCODE
+    Exit $LASTEXITCODE
 }
 
 Write-Host "======== Windows: Force version " $VERSION
@@ -288,7 +288,7 @@ Write-Host "======== Windows: Build in " $BUILD_DIR
 try {& $BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $BLD_NUM}
 catch {
 Write-Host "Failed with error" $LASTEXITCODE
-exit $LASTEXITCODE
+Exit $LASTEXITCODE
 }
 Exit
 '''
@@ -312,7 +312,7 @@ $PATH = "$WORKSPACE\\java-11.0.3\\bin;$PATH"
 try{Set-Location $BUILD_DIR}
 catch{
 Write-Host "Failed with error" $LASTEXITCODE
-exit $LASTEXITCODE
+Exit $LASTEXITCODE
 }
 
 Start-Transcript -Path local.properties
@@ -502,7 +502,7 @@ mkdir -p "${REPORTS_DIR}"
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
 ./cbdep.exe install -d $WORKSPACE java 11.0.3
-
+'''
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
@@ -513,7 +513,7 @@ try {
 }
 catch {
     Write-Host "Failed with error" $LASTEXITCODE
-    exit $LASTEXITCODE
+    Exit $LASTEXITCODE
 }
 
 Write-Host "======== Windows: Extract source"
@@ -523,7 +523,7 @@ try {
 }
 catch {
     Write-Host "Failed with error" $LASTEXITCODE
-    exit $LASTEXITCODE
+    Exit $LASTEXITCODE
 }
 
 Write-Host "======== Windows: Force version " $VERSION
