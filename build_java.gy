@@ -230,35 +230,32 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-./cbdep.exe install -d $WORKSPACE java 11.0.3
+./cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
-
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-$SITE="$LATESTBUILDS/couchbase-lite-java/$RELEASE/$BLD_NUM/$SOURCE"
+$SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
 try {
-    & { (New-Object Net.WebClient).DownloadFile('$SITE', '$SOURCE') }
+  (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE)
 }
 catch {
-    Write-Host "Failed with error" $LASTEXITCODE
-    Exit $LASTEXITCODE
+    Write-Host "Failed with error" $_.Exception.toString()
 }
 
 Write-Host "======== Windows: Extract source"
 
 try {
-    cmake -E tar xzf $SOURCE
+    cmake -E tar xzf $env:SOURCE
 }
 catch {
-    Write-Host "Failed with error" $LASTEXITCODE
-    Exit $LASTEXITCODE
+    Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Write-Host "======== Windows: Force version " $VERSION
-Start-Transcript -Path "$CBL_ROOT\\version.txt"
-WRITE-HOST $VERSION
+Write-Host "======== Windows: Force version " $env:VERSION
+Start-Transcript -Path "$env:CBL_ROOT\\version.txt"
+WRITE-HOST $env:VERSION
 Stop-Transcript
 
 Exit
@@ -267,28 +264,26 @@ Exit
 
                                 // Run the build
                                 powershell '''
-$PATH = "$WORKSPACE\\java-11.0.3\\bin;$PATH"
+$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-try { Set-Location $BUILD_DIR }
+try { Set-Location $env:BUILD_DIR }
 catch {
-Write-Host "Failed with error" $LASTEXITCODE
-Exit $LASTEXITCODE
+ Write-Host "Failed with error" $_.Exception.toString()
 }
 
 Write-Host "======== Windows: Environment"
-./javac -version
+javac -version
 Get-ChildItem Env: | Sort Name
 
 Start-Transcript -Path local.properties
 Write-Host ""
 Stop-Transcript
 
-Write-Host "======== Windows: Build in " $BUILD_DIR
+Write-Host "======== Windows: Build in " $env:BUILD_DIR
 
-try {& $BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $BLD_NUM}
+try {& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM}
 catch {
-Write-Host "Failed with error" $LASTEXITCODE
-Exit $LASTEXITCODE
+ Write-Host "Failed with error" $_.Exception.toString()
 }
 Exit
 '''
@@ -306,29 +301,27 @@ Exit
                                 }
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                    powershell '''
-$PATH = "$WORKSPACE\\java-11.0.3\\bin;$PATH"
+                                 powershell '''
+$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-try{Set-Location $BUILD_DIR}
+try{Set-Location $env:BUILD_DIR}
 catch{
-Write-Host "Failed with error" $LASTEXITCODE
-Exit $LASTEXITCODE
+ Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Start-Transcript -Path local.properties
-Write-Host "maven.repo.user="$MAVEN_REPO_USR
-Write-Host "maven.repo.pass="$MAVEN_REPO_PSW
+Start-Transcript -Path "local.properties"
+Write-Host "maven.repo.user="$env:MAVEN_REPO_USR
+Write-Host "maven.repo.pass="$env:MAVEN_REPO_PSW
 Stop-Transcript
 
 Write-Host "======= Windows: Publish"
-New-Item -Path "$WORKSPACE\\artifacts"
+New-Item -Path "$env:WORKSPACE\\artifacts"
 
 try {
-& $BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $VERSION -buildNumber $BLD_NUM  -artifactsDir "$WORKSPACE\\artifacts"
+& $env:BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $env:VERSION -buildNumber $env:BLD_NUM  -artifactsDir "$env:WORKSPACE\\artifacts"
 }
 catch {
-Write-Host "Failed with error" $LASTEXITCODE
-Exit $LASTEXITCODE
+ Write-Host "Failed with error" $_.Exception.toString()
 }
 
 Exit
@@ -497,38 +490,35 @@ mkdir -p "${REPORTS_DIR}"
                             steps {
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true)
-
-                                // Install Java 11
+                                 // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-./cbdep.exe install -d $WORKSPACE java 11.0.3
+./cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-$SITE="$LATESTBUILDS/couchbase-lite-java/$RELEASE/$BLD_NUM/$SOURCE"
+$SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
 try {
-    & { (New-Object Net.WebClient).DownloadFile('$SITE', '$SOURCE') }
+    (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE)
 }
 catch {
-    Write-Host "Failed with error" $LASTEXITCODE
-    Exit $LASTEXITCODE
+   Write-Host "Failed with error" $_.Exception.toString()
 }
 
 Write-Host "======== Windows: Extract source"
 
 try {
-    cmake -E tar xzf $SOURCE
+    cmake -E tar xzf $env:SOURCE
 }
 catch {
-    Write-Host "Failed with error" $LASTEXITCODE
-    Exit $LASTEXITCODE
+    Write-Host "Failed with error" $_.Exception.toString()
 }
 
 Write-Host "======== Windows: Force version " $VERSION
-Start-Transcript -Path "$CBL_ROOT\\version.txt"
-WRITE-HOST $VERSION
+Start-Transcript -Path "$env:CBL_ROOT\\version.txt"
+WRITE-HOST $env:VERSION
 Stop-Transcript
 
 Exit
@@ -537,24 +527,23 @@ Exit
 
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                                    powershell '''
-$PATH = "$WORKSPACE\\java-11.0.3\\bin;$PATH"
+                                powershell '''
+$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-try {Set-Location $BUILD_DIR}
+try {Set-Location $env:BUILD_DIR}
 catch {
-    Write-Host "Failed with error" $LASTEXITCODE
-    Exit $LASTEXITCODE
+     Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Start-Transcirpt -Path "local.properties"
+Start-Transcript -Path "local.properties"
 Write-Host ""
 Stop-Transcript
 
 Write-Host "======== Windows: Test"
-New-Item -Path "$WORKSPACE\\reports"
+New-Item -Path "$env:WORKSPACE\\reports"
 
 try {
-    & $BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $BLD_NUM -reportsDir "$WORKSPACE\\reports"
+    & $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $env:BLD_NUM -reportsDir "$env:WORKSPACE\\reports"
 }
 catch {
     Exit 5
