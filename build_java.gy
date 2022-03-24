@@ -254,9 +254,7 @@ catch {
 }
 
 Write-Host "======== Windows: Force version " $env:VERSION
-Start-Transcript -Path "$env:CBL_ROOT\\version.txt"
-WRITE-HOST $env:VERSION
-Stop-Transcript
+$env:VERSION | Out-File $env:CBL_ROOT\\version.txt
 
 Exit
 
@@ -275,9 +273,7 @@ Write-Host "======== Windows: Environment"
 javac -version
 Get-ChildItem Env: | Sort Name
 
-Start-Transcript -Path local.properties
-Write-Host ""
-Stop-Transcript
+Out-File local.properties
 
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
 
@@ -309,10 +305,9 @@ catch{
  Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Start-Transcript -Path "local.properties"
-Write-Host "maven.repo.user="$env:MAVEN_REPO_USR
-Write-Host "maven.repo.pass="$env:MAVEN_REPO_PSW
-Stop-Transcript
+$maven_usr = "maven.repo.user=$env:MAVEN_REPO_USR"
+$maven_psw = "maven.repo.pass=$env:MAVEN_REPO_PSW"
+$maven_usr, $maven_psw | Out-File local.porperties
 
 Write-Host "======= Windows: Publish"
 New-Item -Path "$env:WORKSPACE\\artifacts"
@@ -517,9 +512,7 @@ catch {
 }
 
 Write-Host "======== Windows: Force version " $VERSION
-Start-Transcript -Path "$env:CBL_ROOT\\version.txt"
-WRITE-HOST $env:VERSION
-Stop-Transcript
+$env:VERSION | Out-File $env:CBL_ROOT\\version.txt
 
 Exit
 
@@ -535,9 +528,7 @@ catch {
      Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Start-Transcript -Path "local.properties"
-Write-Host ""
-Stop-Transcript
+Out-File local.properties
 
 Write-Host "======== Windows: Test"
 New-Item -Path "$env:WORKSPACE\\reports"
