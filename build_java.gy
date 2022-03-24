@@ -228,56 +228,71 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 cleanWs(deleteDirs: true)
 
                                 // Install Java 11
-                                bat '''
-curl -o cbdep.exe http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe
-cbdep.exe install -d %WORKSPACE% java 11.0.3
+                                powershell '''
+Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
+./cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
-
                                 // Download the source
-                                bat '''
-echo "======== Windows: Download source"
-set SITE=%LATESTBUILDS%/couchbase-lite-java/%RELEASE%/%BLD_NUM%/%SOURCE%
-powershell -command "& { (New-Object Net.WebClient).DownloadFile('%SITE%', '%SOURCE%') }" || goto error
+                                powershell '''
+Write-Host "======== Windows: Download source"
+$SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
-echo "======== Windows: Extract source"
-cmake -E tar xzf %SOURCE% || goto error
+try {
+  (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE)
+}
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+}
 
-echo "======== Windows: Force version "%VERSION%
-echo %VERSION% > %CBL_ROOT%\\version.txt
+Write-Host "======== Windows: Extract source"
 
-goto :eof
+try {
+    cmake -E tar xzf $env:SOURCE
+}
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+}
 
-:error
-echo Failed with error %ERRORLEVEL%.
-exit /b %ERRORLEVEL%
+Write-Host "======== Windows: Force version " $env:VERSION
+Start-Transcript -Path "$env:CBL_ROOT\\version.txt"
+WRITE-HOST $env:VERSION
+Stop-Transcript
+
+Exit
+
 '''
 
                                 // Run the build
-                                bat '''
-SET PATH=%WORKSPACE%\\java-11.0.3\\bin;%PATH%
+                                powershell '''
+$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-cd %BUILD_DIR% || goto error
+try { Set-Location $env:BUILD_DIR }
+catch {
+ Write-Host "Failed with error" $_.Exception.toString()
+}
 
-echo "======== Windows: Environment"
+Write-Host "======== Windows: Environment"
 javac -version
-set
+Get-ChildItem Env: | Sort Name
 
-echo ""> local.properties
+Start-Transcript -Path local.properties
+Write-Host ""
+Stop-Transcript
 
-echo ======== Windows: Build in %BUILD_DIR%
-powershell.exe -ExecutionPolicy Bypass -Command "%BUILD_DIR%\\etc\\jenkins\\build_windows.ps1" 2017 %BLD_NUM% || goto error
+Write-Host "======== Windows: Build in " $env:BUILD_DIR
 
-goto :eof
-
-:error
-echo Failed with error %ERRORLEVEL%.
-exit /b %ERRORLEVEL%
+try {& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM}
+catch {
+ Write-Host "Failed with error" $_.Exception.toString()
+}
+Exit
 '''
                             }
                         }
 
                         // Publish to maven
                         stage('Win: Publish phase I artifacts') {
+                         
                             environment { MAVEN_REPO = credentials('ProgetApiKey') }
                             steps {
                                 script {
@@ -286,23 +301,31 @@ exit /b %ERRORLEVEL%
                                 }
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                    bat '''
-SET PATH=%WORKSPACE%\\java-11.0.3\\bin;%PATH%
+                                 powershell '''
+$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-cd %BUILD_DIR% || goto error
+try{Set-Location $env:BUILD_DIR}
+catch{
+ Write-Host "Failed with error" $_.Exception.toString()
+}
 
-echo maven.repo.user=%MAVEN_REPO_USR%> local.properties
-echo maven.repo.pass=%MAVEN_REPO_PSW%>> local.properties
+Start-Transcript -Path "local.properties"
+Write-Host "maven.repo.user="$env:MAVEN_REPO_USR
+Write-Host "maven.repo.pass="$env:MAVEN_REPO_PSW
+Stop-Transcript
 
-echo ======== Windows: Publish
-mkdir %WORKSPACE%\\artifacts
-powershell.exe -ExecutionPolicy Bypass -Command "%BUILD_DIR%\\etc\\jenkins\\publish_windows.ps1" %VERSION% %BLD_NUM% %WORKSPACE%\\artifacts || goto error
+Write-Host "======= Windows: Publish"
+New-Item -Path "$env:WORKSPACE\\artifacts"
 
-goto :eof
+try {
+& $env:BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $env:VERSION -buildNumber $env:BLD_NUM  -artifactsDir "$env:WORKSPACE\\artifacts"
+}
+catch {
+ Write-Host "Failed with error" $_.Exception.toString()
+}
 
-:error
-echo Failed with error %ERRORLEVEL%.
-exit /b %ERRORLEVEL%
+Exit
+
 '''
                                 }
 
@@ -467,52 +490,66 @@ mkdir -p "${REPORTS_DIR}"
                             steps {
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true)
-
-                                // Install Java 11
-                                bat '''
-curl -o cbdep.exe http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe
-cbdep.exe install -d %WORKSPACE% java 11.0.3
+                                 // Install Java 11
+                                powershell '''
+Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
+./cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
-
                                 // Download the source
-                                bat '''
-echo "======== Windows: Download source"
-set SITE=%LATESTBUILDS%/couchbase-lite-java/%RELEASE%/%BLD_NUM%/%SOURCE%
-powershell -command "& { (New-Object Net.WebClient).DownloadFile('%SITE%', '%SOURCE%') }" || goto error
+                                powershell '''
+Write-Host "======== Windows: Download source"
+$SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
-echo "======== Windows: Extract source"
-cmake -E tar xzf %SOURCE% || goto error
+try {
+    (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE)
+}
+catch {
+   Write-Host "Failed with error" $_.Exception.toString()
+}
 
-echo "======== Windows: Force version "%VERSION%
-echo %VERSION% > %CBL_ROOT%\\version.txt
+Write-Host "======== Windows: Extract source"
 
-goto :eof
+try {
+    cmake -E tar xzf $env:SOURCE
+}
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+}
 
-:error
-echo Failed with error %ERRORLEVEL%.
-exit /b %ERRORLEVEL%
+Write-Host "======== Windows: Force version " $VERSION
+Start-Transcript -Path "$env:CBL_ROOT\\version.txt"
+WRITE-HOST $env:VERSION
+Stop-Transcript
+
+Exit
+
 '''
 
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                                    bat '''
-SET PATH=%WORKSPACE%\\java-11.0.3\\bin;%PATH%
+                                powershell '''
+$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-cd %BUILD_DIR% || goto error
+try {Set-Location $env:BUILD_DIR}
+catch {
+     Write-Host "Failed with error" $_.Exception.toString()
+}
 
-echo ""> local.properties
+Start-Transcript -Path "local.properties"
+Write-Host ""
+Stop-Transcript
 
-echo ======== Windows: Test
-mkdir %WORKSPACE%\\reports
+Write-Host "======== Windows: Test"
+New-Item -Path "$env:WORKSPACE\\reports"
 
-powershell.exe -ExecutionPolicy Bypass -Command "%BUILD_DIR%\\etc\\jenkins\\test_windows.ps1" %BLD_NUM% %WORKSPACE%\\reports || exit 5
+try {
+    & $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $env:BLD_NUM -reportsDir "$env:WORKSPACE\\reports"
+}
+catch {
+    Exit 5
+}
 
-
-goto :eof
-
-:error
-echo Failed with error %ERRORLEVEL%.
-exit /b %ERRORLEVEL%
+Exit
 '''
                                 }
 
