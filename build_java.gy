@@ -416,7 +416,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true,
                                 disableDeferredWipeout: true,
-                    			patterns:[[pattern: '*.log', type: 'EXCLUDE']]))
+                    			patterns:[[pattern: '*.log', type: 'EXCLUDE']])
 
                                 // Download the source
                                 sh '''#!/bin/bash
@@ -489,7 +489,7 @@ mkdir -p "${REPORTS_DIR}"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, 
                                  		disableDeferredWipeout: true,
-                    					patterns:[[pattern: '*.log', type: 'EXCLUDE']]))
+                    					patterns:[[pattern: '*.log', type: 'EXCLUDE']])
                                  // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
