@@ -307,10 +307,10 @@ catch{
 
 $maven_usr = "maven.repo.user=$env:MAVEN_REPO_USR"
 $maven_psw = "maven.repo.pass=$env:MAVEN_REPO_PSW"
-$maven_usr, $maven_psw | Out-File local.porperties
+$maven_usr, $maven_psw | Out-File local.properties
 
 Write-Host "======= Windows: Publish"
-New-Item -Path "$env:WORKSPACE\\artifacts"
+New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
 
 try {
 & $env:BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $env:VERSION -buildNumber $env:BLD_NUM  -artifactsDir "$env:WORKSPACE\\artifacts"
