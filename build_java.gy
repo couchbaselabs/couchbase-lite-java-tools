@@ -414,7 +414,9 @@ mkdir -p "${ARTIFACTS_DIR}"
                         stage('OSX: Test') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true)
+                                cleanWs(deleteDirs: true,
+                                disableDeferredWipeout: true,
+                    			patterns:[[pattern: '*.log', type: 'EXCLUDE']]))
 
                                 // Download the source
                                 sh '''#!/bin/bash
@@ -485,7 +487,9 @@ mkdir -p "${REPORTS_DIR}"
                         stage('Win: Test') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true)
+                                cleanWs(deleteDirs: true, 
+                                 		disableDeferredWipeout: true,
+                    					patterns:[[pattern: '*.log', type: 'EXCLUDE']]))
                                  // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
