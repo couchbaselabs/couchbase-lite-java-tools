@@ -277,9 +277,10 @@ Out-File local.properties
 
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
 
-try {& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM}
-catch {
- Write-Host "Failed with error" $_.Exception.toString()
+& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM}
+if($LASTEXITCODE -ne 0){
+ Write-Host "Failed with error" $LASTEXITCODE
+ Exit $LASTEXITCODE
 }
 Exit
 '''
@@ -312,11 +313,11 @@ $maven_usr, $maven_psw | Out-File local.properties
 Write-Host "======= Windows: Publish"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
 
-try {
+
 & $env:BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $env:VERSION -buildNumber $env:BLD_NUM  -artifactsDir "$env:WORKSPACE\\artifacts"
-}
-catch {
- Write-Host "Failed with error" $_.Exception.toString()
+if($LASTEXITCODE -ne 0)
+ Write-Host "Failed with error" $LASTEXITCODE
+ Exit $LASTEXITCODE
 }
 
 Exit
@@ -533,11 +534,10 @@ Out-File local.properties
 Write-Host "======== Windows: Test"
 New-Item -Path "$env:WORKSPACE\\reports"
 
-try {
-    & $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $env:BLD_NUM -reportsDir "$env:WORKSPACE\\reports"
-}
-catch {
-    Exit 5
+
+& $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $env:BLD_NUM -reportsDir "$env:WORKSPACE\\reports"
+if($LASTEXITCODE -ne 0){
+	Exit 5
 }
 
 Exit
