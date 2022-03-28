@@ -535,7 +535,7 @@ catch {
 New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Test"
-New-Item -Path "$env:WORKSPACE\\reports"
+New-Item -ItemType "directory" -Path "$env:WORKSPACE\\reports"
 
 
 & $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $env:BLD_NUM -reportsDir "$env:WORKSPACE\\reports"
