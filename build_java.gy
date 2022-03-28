@@ -76,7 +76,8 @@ pipeline {
         stage('Check') {
             steps {
                 // Clean the workspace
-                cleanWs(deleteDirs: true)
+                cleanWs(deleteDirs: true, 
+                         disableDeferredWipeout: true)
 
                 // Download the source
                 sh '''#!/bin/bash
@@ -125,7 +126,8 @@ echo "======== Linux: Check in `pwd`"
                         stage('OSX: Build') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true)
+                                cleanWs(deleteDirs: true, 
+                                         disableDeferredWipeout: true)
 
                                 // Download the source
                                 sh '''#!/bin/bash
@@ -225,7 +227,8 @@ mkdir -p "${ARTIFACTS_DIR}"
                         stage('Win: Build') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true)
+                                cleanWs(deleteDirs: true, 
+                                         disableDeferredWipeout: true)
 
                                 // Install Java 11
                                 powershell '''
@@ -273,11 +276,11 @@ Write-Host "======== Windows: Environment"
 javac -version
 Get-ChildItem Env: | Sort Name
 
-Out-File local.properties
+New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
 
-& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM}
+& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM
 if($LASTEXITCODE -ne 0){
  Write-Host "Failed with error" $LASTEXITCODE
  Exit $LASTEXITCODE
@@ -306,16 +309,16 @@ catch{
  Write-Host "Failed with error" $_.Exception.toString()
 }
 
-$maven_usr = "maven.repo.user=$env:MAVEN_REPO_USR"
-$maven_psw = "maven.repo.pass=$env:MAVEN_REPO_PSW"
-$maven_usr, $maven_psw | Out-File local.properties
+Set-Content ".\\local.properties" -Value "maven.repo.user=$env:MAVEN_REPO_USR"
+Add-Content ".\\local.properties" -Value "maven.repo.pass=$env:MAVEN_REPO_PSW"
+
 
 Write-Host "======= Windows: Publish"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
 
 
 & $env:BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $env:VERSION -buildNumber $env:BLD_NUM  -artifactsDir "$env:WORKSPACE\\artifacts"
-if($LASTEXITCODE -ne 0)
+if($LASTEXITCODE -ne 0){
  Write-Host "Failed with error" $LASTEXITCODE
  Exit $LASTEXITCODE
 }
@@ -415,8 +418,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                             steps {
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true,
-                                disableDeferredWipeout: true,
-                    			patterns:[[pattern: '*.log', type: 'EXCLUDE']])
+                                disableDeferredWipeout: true)
 
                                 // Download the source
                                 sh '''#!/bin/bash
@@ -488,8 +490,7 @@ mkdir -p "${REPORTS_DIR}"
                             steps {
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, 
-                                 		disableDeferredWipeout: true,
-                    					patterns:[[pattern: '*.log', type: 'EXCLUDE']])
+                                 		disableDeferredWipeout: true)
                                  // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
@@ -533,7 +534,7 @@ catch {
      Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Out-File local.properties
+New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Test"
 New-Item -Path "$env:WORKSPACE\\reports"
