@@ -257,8 +257,7 @@ catch {
 }
 
 Write-Host "======== Windows: Force version " $env:VERSION
-$env:VERSION | Out-File $env:CBL_ROOT\\version.txt
-
+Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
 Exit
 
 '''
@@ -517,9 +516,8 @@ catch {
     Write-Host "Failed with error" $_.Exception.toString()
 }
 
-Write-Host "======== Windows: Force version " $VERSION
-$env:VERSION | Out-File $env:CBL_ROOT\\version.txt
-
+Write-Host "======== Windows: Force version" $env:VERSION
+Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
 Exit
 
 '''
