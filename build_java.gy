@@ -76,8 +76,7 @@ pipeline {
         stage('Check') {
             steps {
                 // Clean the workspace
-                cleanWs(deleteDirs: true, 
-                         disableDeferredWipeout: true)
+                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
                 // Download the source
                 sh '''#!/bin/bash
@@ -126,8 +125,7 @@ echo "======== Linux: Check in `pwd`"
                         stage('OSX: Build') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true, 
-                                         disableDeferredWipeout: true)
+                                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
                                 // Download the source
                                 sh '''#!/bin/bash
@@ -227,8 +225,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                         stage('Win: Build') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true, 
-                                         disableDeferredWipeout: true)
+                                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
                                 // Install Java 11
                                 powershell '''
@@ -240,26 +237,21 @@ Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows
 Write-Host "======== Windows: Download source"
 $SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
-try {
-  (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE)
-}
+try { (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE) }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 Write-Host "======== Windows: Extract source"
-
-try {
-    cmake -E tar xzf $env:SOURCE
-}
+try { cmake -E tar xzf $env:SOURCE }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 Write-Host "======== Windows: Force version " $env:VERSION
 Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
-Exit
-
 '''
 
                                 // Run the build
@@ -268,7 +260,8 @@ $env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
 catch {
- Write-Host "Failed with error" $_.Exception.toString()
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 Write-Host "======== Windows: Environment"
@@ -278,20 +271,17 @@ Get-ChildItem Env: | Sort Name
 New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
-
 & $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM
-if($LASTEXITCODE -ne 0){
- Write-Host "Failed with error" $LASTEXITCODE
- Exit $LASTEXITCODE
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Failed with error" $LASTEXITCODE
+    Exit 5
 }
-Exit
 '''
                             }
                         }
 
                         // Publish to maven
                         stage('Win: Publish phase I artifacts') {
-                         
                             environment { MAVEN_REPO = credentials('ProgetApiKey') }
                             steps {
                                 script {
@@ -303,27 +293,23 @@ Exit
                                  powershell '''
 $env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-try{Set-Location $env:BUILD_DIR}
-catch{
- Write-Host "Failed with error" $_.Exception.toString()
+try { Set-Location $env:BUILD_DIR }
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 Set-Content ".\\local.properties" -Value "maven.repo.user=$env:MAVEN_REPO_USR"
 Add-Content ".\\local.properties" -Value "maven.repo.pass=$env:MAVEN_REPO_PSW"
 
-
 Write-Host "======= Windows: Publish"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
 
-
 & $env:BUILD_DIR\\etc\\jenkins\\publish_windows.ps1 -version $env:VERSION -buildNumber $env:BLD_NUM  -artifactsDir "$env:WORKSPACE\\artifacts"
-if($LASTEXITCODE -ne 0){
- Write-Host "Failed with error" $LASTEXITCODE
- Exit $LASTEXITCODE
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Failed with error" $LASTEXITCODE
+    Exit 5
 }
-
-Exit
-
 '''
                                 }
 
@@ -416,8 +402,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                         stage('OSX: Test') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true,
-                                disableDeferredWipeout: true)
+                                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
                                 // Download the source
                                 sh '''#!/bin/bash
@@ -488,8 +473,8 @@ mkdir -p "${REPORTS_DIR}"
                         stage('Win: Test') {
                             steps {
                                 // Clean the workspace
-                                cleanWs(deleteDirs: true, 
-                                 		disableDeferredWipeout: true)
+                                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
+
                                  // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
@@ -500,25 +485,21 @@ Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows
 Write-Host "======== Windows: Download source"
 $SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
-try {
-    (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE)
-}
+try { (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE) }
 catch {
-   Write-Host "Failed with error" $_.Exception.toString()
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 Write-Host "======== Windows: Extract source"
-
-try {
-    cmake -E tar xzf $env:SOURCE
-}
+try { cmake -E tar xzf $env:SOURCE }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 Write-Host "======== Windows: Force version" $env:VERSION
 Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
-Exit
 
 '''
 
@@ -527,9 +508,10 @@ Exit
                                 powershell '''
 $env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
 
-try {Set-Location $env:BUILD_DIR}
+try { Set-Location $env:BUILD_DIR }
 catch {
-     Write-Host "Failed with error" $_.Exception.toString()
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
 }
 
 New-Item ".\\local.properties"
@@ -537,13 +519,11 @@ New-Item ".\\local.properties"
 Write-Host "======== Windows: Test"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\reports"
 
-
 & $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber $env:BLD_NUM -reportsDir "$env:WORKSPACE\\reports"
-if($LASTEXITCODE -ne 0){
-	Exit 5
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Failed with error" $LASTEXITCODE
+    Exit 5
 }
-
-Exit
 '''
                                 }
 
