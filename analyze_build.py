@@ -1,9 +1,9 @@
 """
 Paw through test results to see what happened
 """
+import argparse
 import os
 import shutil
-import sys
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
@@ -19,8 +19,12 @@ def delete_quietly(path):
     except OSError:
         pass
 
+def check_tests(root, file):
+    for failure in ET.parse(os.path.join(root, file)).getroot().findall("./testcase[failure]"):
+        failed_test = failure.attrib
+        print("  FAILED TEST: {klass}.{test}".format(klass=failed_test["classname"], test=failed_test["name"]))
 
-def get_reports(path):
+def fetch_reports(path):
     url = LATESTBUILDS + path
     try:
         urllib.request.urlretrieve(url, "report.zip")
@@ -32,23 +36,34 @@ def get_reports(path):
         delete_quietly("report.zip")
 
 
-def analyze_tests(platform, root):
+def analyze_java_tests(platform, root):
     print("Checking platform: {platform}".format(platform=platform))
-    reports = [name for name in os.listdir(root) if name.endswith(".xml") and os.path.isfile(os.path.join(root, name))]
+    reports = [name for name in os.listdir(root) if
+               name.endswith(".xml") and os.path.isfile(os.path.join(root, name))]
     if len(reports) <= 1:
-        raise Exception("No reports for platform: " + platform)
+        raise Exception("No test reports for " + platform)
     for file in reports:
-        for failure in ET.parse(os.path.join(root, file)).getroot().findall("./testcase[failure]"):
-            failed_test = failure.attrib
-            print("FAILED TEST: {klass}.{test}".format(klass=failed_test["classname"], test=failed_test["name"]))
+        check_tests(root, file)
+    print()
+
+
+def analyze_android_tests(root):
+    reports = [name for name in os.listdir(root) if
+               name.endswith("-test-.xml") and os.path.isfile(os.path.join(root, name))]
+    if len(reports) <= 1:
+        raise Exception("No test reports for android")
+    for file in reports:
+        print("Checking android device: {device}".format(device=file[5:-10].replace(" ", "")))
+        check_tests(root, file)
+        print()
 
 
 def check_java(build_num):
     for platform in JAVA_VARIANTS:
         try:
-            get_reports(
+            fetch_reports(
                 "couchbase-lite-java/3.1.0/{n}/test-reports-{platform}-ee.zip".format(n=build_num, platform=platform))
-            analyze_tests(platform, "test/raw")
+            analyze_java_tests(platform, "test/raw")
         except Exception as e:
             print(str(e))
         finally:
@@ -58,8 +73,8 @@ def check_java(build_num):
 # should print the device name, somehow?
 def check_android(build_num):
     try:
-        get_reports("couchbase-lite-android/3.1.0/{n}/test-reports-android-ee.zip".format(n=build_num))
-        analyze_tests("android", "connected/raw")
+        fetch_reports("couchbase-lite-android/3.1.0/{n}/test-reports-android-ee.zip".format(n=build_num))
+        analyze_android_tests("connected/raw")
     except Exception as e:
         print(str(e))
     finally:
@@ -67,8 +82,16 @@ def check_android(build_num):
 
 
 def main():
-    if len(sys.argv) != 3:
-        sys.exit("Usage: python analyze_build.py <android build #> <java build #>")
+    parser = argparse.ArgumentParser(description='Analyze')
+    parser.add_argument('-a', '--android', type=int, help='Android build to be analyzed')
+    parser.add_argument('-j', '--java', type=int, help='Java build to be analyzed')
+
+    args = parser.parse_args()
+
+    if not (args.android or args.java):
+        print("Must supply at least one of android or java build number")
+        parser.print_usage()
+        exit(-1)
 
     delete_quietly(WORKING_DIR)
     try:
@@ -76,8 +99,12 @@ def main():
 
         try:
             os.chdir(WORKING_DIR)
-            check_android(sys.argv[1])
-            check_java(sys.argv[2])
+
+            if args.android:
+                check_android(args.android)
+
+            if args.java:
+                check_java(args.java)
         finally:
             os.chdir("../")
 
