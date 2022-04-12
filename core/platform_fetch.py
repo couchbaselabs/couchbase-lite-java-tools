@@ -15,7 +15,8 @@ def subdirectory_for_variant(os: str, abi: str):
         The relative path name at which to store the variant
     """
 
-    if os == "macosx":
-        os = "macos"
+    if os == "macos":
+        abi = "x86_64"
 
     return f"{os}/{abi}"
+
