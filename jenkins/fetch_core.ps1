@@ -6,8 +6,8 @@ param(
     [switch]$DebugLib
 )
 
-$RootDir="$PSScriptRoot/../.."
-$CoreDir="$RootDir/common/lite-core"
+$RootDir="$PSScriptRoot\..\.."
+$CoreDir="$RootDir\common\lite-core"
 
 $DebugOpt = ""
 if($DebugLib) {
@@ -24,17 +24,19 @@ if($Edition -eq 'EE') {
     $CoreVersion = "${CoreVersion}-EE"
 }
 
-Remove-Item ./.penv -Force  -Recurse -ErrorAction SilentlyContinue
-python3 -m venv ./.penv
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-.\.penv\Scripts\Activate.ps1
+Remove-Item .\.penv -Force  -Recurse -ErrorAction SilentlyContinue
+python -m venv .\.penv
+.\.penv\Scripts\activate
 
 pip -q install GitPython
 
-Write-Host "=== Fetching artifacts for Core-${CoreVersion}-${Edition} on Win64"
-New-Item -Type directory -ErrorAction Ignore $OutputDir
-python "${RootDir}/core_tools/fetch_litecore_version.py" -x "${RootDir}/etc/core" -b "${CoreVersion}" -v windows-win64 $DebugOpt -o "${OutputDir}"
+Write-Host "=== Fetching artifacts for Core-${CoreVersion} on Win64"
+New-Item -Type directory -ErrorAction Ignore "${CoreDir}"
+python "${RootDir}\core_tools\fetch_litecore_version.py" -x "${RootDir}\etc\core" -b "${CoreVersion}" -v windows-win64 $DebugOpt -o "${CoreDir}"
 
-Deactivate
-Remove-Item ./.penv -Force  -Recurse -ErrorAction SilentlyContinue
+deactivate
+Remove-Item .\.penv -Force  -Recurse -ErrorAction SilentlyContinue
+
+# Ugly little kludge to get the DLL to the right place
+Copy-Item "${CoreDir}\windows\x86_64\bin\*.dll" -Destination "${CoreDir}\windows\x86_64\lib"
 

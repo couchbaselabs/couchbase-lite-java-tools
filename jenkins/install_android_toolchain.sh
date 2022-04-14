@@ -26,4 +26,5 @@ ln -s "${NINJA_DIR}/bin/ninja" "${CMAKE_DIR}/bin/ninja"
 SDK_MGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --channel=1"
 yes | ${SDK_MGR} --licenses > /dev/null 2>&1
 ${SDK_MGR} --install "build-tools;${BUILD_TOOLS_VERSION}"
+${SDK_MGR} --install "ndk;${NDK_VERSION}"
 

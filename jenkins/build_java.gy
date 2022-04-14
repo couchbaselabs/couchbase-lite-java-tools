@@ -93,6 +93,11 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                 // Run checks
                 sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+# trim the string...
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 touch "local.properties"
@@ -142,7 +147,8 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                                 // Run the build
                                 sh '''#!/bin/bash
-export JAVA_HOME="/usr/local/opt/java11"
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -170,6 +176,10 @@ echo "======== OSX: Build in `pwd`"
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                     sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
@@ -230,25 +240,22 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-./cbdep.exe install -d $env:WORKSPACE java 11.0.3
+.\\cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-$SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
-
-try { (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE) }
+try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
     Exit 5
 }
 
 Write-Host "======== Windows: Extract source"
-try { cmake -E tar xzf $env:SOURCE }
-catch {
-    Write-Host "Failed with error" $_.Exception.toString()
-    Exit 5
-}
+7z x source.tar.gz
+Remove-Item $env:SOURCE -Force -ErrorAction SilentlyContinue
+7z x -y source.tar
+Remove-Item source.tar -Force -ErrorAction SilentlyContinue
 
 Write-Host "======== Windows: Force version " $env:VERSION
 Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
@@ -256,7 +263,8 @@ Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
 
                                 // Run the build
                                 powershell '''
-$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
+$env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
+$env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
 catch {
@@ -271,7 +279,7 @@ Get-ChildItem Env: | Sort Name
 New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
-& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber $env:BLD_NUM
+& $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber "${env:BLD_NUM}"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Failed with error" $LASTEXITCODE
     Exit 5
@@ -290,8 +298,9 @@ if ($LASTEXITCODE -ne 0) {
                                 }
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                 powershell '''
-$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
+                                powershell '''
+$env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
+$env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
 catch {
@@ -349,6 +358,10 @@ if ($LASTEXITCODE -ne 0) {
         stage('Linux: Build') {
             steps {
                 sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 echo "======== Linux: Build in `pwd`"
@@ -367,6 +380,10 @@ echo "======== Linux: Build in `pwd`"
                 }
 
                 sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
@@ -420,6 +437,10 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                                 sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 touch "local.properties"
@@ -478,35 +499,33 @@ mkdir -p "${REPORTS_DIR}"
                                  // Install Java 11
                                 powershell '''
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-./cbdep.exe install -d $env:WORKSPACE java 11.0.3
+.\\cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-$SITE="$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE"
 
-try { (New-Object Net.WebClient).DownloadFile($SITE, $env:SOURCE) }
+try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
     Exit 5
 }
 
 Write-Host "======== Windows: Extract source"
-try { cmake -E tar xzf $env:SOURCE }
-catch {
-    Write-Host "Failed with error" $_.Exception.toString()
-    Exit 5
-}
+7z x source.tar.gz
+Remove-Item $env:SOURCE -Force -ErrorAction SilentlyContinue
+7z x -y source.tar
+Remove-Item source.tar -Force -ErrorAction SilentlyContinue
 
 Write-Host "======== Windows: Force version" $env:VERSION
 Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
-
 '''
 
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                                 powershell '''
-$env:PATH = "$env:WORKSPACE\\java-11.0.3\\bin;$env:PATH"
+$env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
+$env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
 catch {
@@ -568,6 +587,10 @@ if ($LASTEXITCODE -ne 0) {
                 // Run the tests
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 echo "======== Linux: Test in `pwd`"
@@ -618,6 +641,10 @@ mkdir -p "${REPORTS_DIR}"
                 // Publish to Maven
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
+JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
+export JAVA_HOME=`echo $JAVA_HOME`
+export PATH="${JAVA_HOME}/bin:$PATH"
+
 cd "${BUILD_DIR}"
 
 ARTIFACTS_DIR="$WORKSPACE/artifacts"

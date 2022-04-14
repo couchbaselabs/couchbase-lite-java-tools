@@ -59,23 +59,25 @@ done
 
 if [ -z "${EDITION}" ]; then echo >&2 "Must specify an edition"; usage; fi
 
-if [ -z "${PLATFORM}" ]; then
-   case ${OSTYPE} in
-      darwin*)
-         PLATFORM='macos'
-         ;;
-      win*)
-         PLATFORM=windows-win64
-         ;;
-      linux*)
-         PLATFORM=linux
-         ;;
-      *)
-         echo "Unsupported platform: ${OSTYPE}"
-         exit 1
-         ;;
-   esac
-fi
+if [ -z "${PLATFORM}" ]; then PLATFORM=$OSTYPE; fi
+case "${PLATFORM}" in
+   android*)
+      PLATFORM='android'
+      ;;
+   darwin*|mac*)
+      PLATFORM='macos'
+      ;;
+   win*)
+      PLATFORM=windows-win64
+      ;;
+   linux*)
+      PLATFORM=linux
+      ;;
+   *)
+      echo "Unsupported platform: ${PLATFORM}"
+      usage
+      ;;
+esac
 
 CORE_VERSION=`cat "${ROOT_DIR}/core_version.txt"`
 if [ -z "${CORE_VERSION}" ]; then echo >&2 "Cannot get core version"; exit 1; fi
@@ -93,3 +95,9 @@ python "${ROOT_DIR}/core_tools/fetch_litecore_version.py" -x "${ROOT_DIR}/etc/co
 
 deactivate
 rm -rf ./.penv
+
+# Ugly little kludge to get the Windows DLL to the right place
+if [ $PLATFORM == "windows-win64" ]; then
+   cp "${CORE_DIR}/windows/x86_64/bin"/*.dll "${CORE_DIR}/windows/x86_64/lib"
+fi
+
