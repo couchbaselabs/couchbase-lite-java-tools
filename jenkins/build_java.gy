@@ -180,11 +180,6 @@ JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
 export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
 
-cd "${BUILD_DIR}"
-
-echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
-echo "maven.repo.pass=${MAVEN_REPO_PSW}" >> "local.properties"
-
 echo "======== OSX: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
@@ -302,15 +297,6 @@ if ($LASTEXITCODE -ne 0) {
 $env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
 $env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
-try { Set-Location $env:BUILD_DIR }
-catch {
-    Write-Host "Failed with error" $_.Exception.toString()
-    Exit 5
-}
-
-Set-Content ".\\local.properties" -Value "maven.repo.user=$env:MAVEN_REPO_USR"
-Add-Content ".\\local.properties" -Value "maven.repo.pass=$env:MAVEN_REPO_PSW"
-
 Write-Host "======= Windows: Publish"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
 
@@ -383,11 +369,6 @@ echo "======== Linux: Build in `pwd`"
 JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
 export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
-
-cd "${BUILD_DIR}"
-
-echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
-echo "maven.repo.pass=${MAVEN_REPO_PSW}" >> "local.properties"
 
 echo "======== Linux: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
