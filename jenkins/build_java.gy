@@ -100,8 +100,6 @@ export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
 
-touch "local.properties"
-
 echo "======== Linux: Environment"
 javac -version
 env | sort
@@ -156,8 +154,6 @@ cd "${BUILD_DIR}"
 echo "======== OSX: Environment"
 javac -version
 env | sort
-
-touch "local.properties"
 
 echo "======== OSX: Build in `pwd`"
 ./etc/jenkins/build_macos.sh ${BLD_NUM} || exit $?
@@ -270,8 +266,6 @@ catch {
 Write-Host "======== Windows: Environment"
 javac -version
 Get-ChildItem Env: | Sort Name
-
-New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
 & $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber "${env:BLD_NUM}"
@@ -424,8 +418,6 @@ export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
 
-touch "local.properties"
-
 echo "======== OSX: Test in `pwd`"
 REPORTS_DIR="$WORKSPACE/reports"
 rm -rf "${REPORTS_DIR}"
@@ -513,8 +505,6 @@ catch {
     Write-Host "Failed with error" $_.Exception.toString()
     Exit 5
 }
-
-New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Test"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\reports"
