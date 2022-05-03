@@ -182,9 +182,6 @@ export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
 
-echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
-echo "maven.repo.pass=${MAVEN_REPO_PSW}" >> "local.properties"
-
 echo "======== OSX: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
@@ -308,9 +305,6 @@ catch {
     Exit 5
 }
 
-Set-Content ".\\local.properties" -Value "maven.repo.user=$env:MAVEN_REPO_USR"
-Add-Content ".\\local.properties" -Value "maven.repo.pass=$env:MAVEN_REPO_PSW"
-
 Write-Host "======= Windows: Publish"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
 
@@ -385,9 +379,6 @@ export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
-
-echo "maven.repo.user=${MAVEN_REPO_USR}" > "local.properties"
-echo "maven.repo.pass=${MAVEN_REPO_PSW}" >> "local.properties"
 
 echo "======== Linux: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
