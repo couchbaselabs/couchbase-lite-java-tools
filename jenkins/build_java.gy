@@ -100,6 +100,8 @@ export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
 
+touch "local.properties"
+
 echo "======== Linux: Environment"
 javac -version
 env | sort
@@ -155,6 +157,8 @@ echo "======== OSX: Environment"
 javac -version
 env | sort
 
+touch "local.properties"
+
 echo "======== OSX: Build in `pwd`"
 ./etc/jenkins/build_macos.sh ${BLD_NUM} || exit $?
 '''
@@ -175,6 +179,8 @@ echo "======== OSX: Build in `pwd`"
 JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
 export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
+
+cd "${BUILD_DIR}"
 
 echo "======== OSX: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
@@ -267,6 +273,8 @@ Write-Host "======== Windows: Environment"
 javac -version
 Get-ChildItem Env: | Sort Name
 
+New-Item ".\\local.properties"
+
 Write-Host "======== Windows: Build in " $env:BUILD_DIR
 & $env:BUILD_DIR\\etc\\jenkins\\build_windows.ps1 -vsGen "2017" -buildNumber "${env:BLD_NUM}"
 if ($LASTEXITCODE -ne 0) {
@@ -290,6 +298,12 @@ if ($LASTEXITCODE -ne 0) {
                                 powershell '''
 $env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
 $env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
+
+try { Set-Location $env:BUILD_DIR }
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
+}
 
 Write-Host "======= Windows: Publish"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\artifacts"
@@ -364,6 +378,8 @@ JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
 export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
 
+cd "${BUILD_DIR}"
+
 echo "======== Linux: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
@@ -417,6 +433,8 @@ export JAVA_HOME=`echo $JAVA_HOME`
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
+
+touch "local.properties"
 
 echo "======== OSX: Test in `pwd`"
 REPORTS_DIR="$WORKSPACE/reports"
@@ -505,6 +523,8 @@ catch {
     Write-Host "Failed with error" $_.Exception.toString()
     Exit 5
 }
+
+New-Item ".\\local.properties"
 
 Write-Host "======== Windows: Test"
 New-Item -ItemType "directory" -Path "$env:WORKSPACE\\reports"
