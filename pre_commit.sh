@@ -6,8 +6,13 @@ for sm in legal etc common ce "."; do
    cd $sm
    git fetch
    echo ""
-   echo "============== `pwd`"
+   echo ""
+   echo "#####################################################"
+   echo "### `pwd`"
+   echo "#####################################################"
+   echo ""
    git status
+   echo "================================================"
    echo ""
    git log -n 2
    cd ..
