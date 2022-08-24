@@ -236,6 +236,7 @@ mkdir -p "${ARTIFACTS_DIR}"
 
                                 // Install Java 11
                                 powershell '''
+Write-Host "======== Windows: Install Java 11"
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
 .\\cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
@@ -489,13 +490,13 @@ mkdir -p "${REPORTS_DIR}"
 
                                  // Install Java 11
                                 powershell '''
+Write-Host "======== Windows: Install Java 11"
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
 .\\cbdep.exe install -d $env:WORKSPACE java 11.0.3
 '''
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-
 try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
