@@ -381,6 +381,9 @@ export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
 
+# pull the lack duck nonsense.
+curl -Lfs https://raw.githubusercontent.com/couchbase/product-metadata/master/couchbase-lite-java/blackduck/${VERSION}/notices.txt -o notices.txt || true
+
 echo "======== Linux: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
