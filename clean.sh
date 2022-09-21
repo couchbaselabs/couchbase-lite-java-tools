@@ -1,8 +1,13 @@
 #!/bin/sh
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+pushd "$SCRIPT_DIR/.." > /dev/null 2>&1
+ROOT=`pwd`
+
 for mod in ce common etc ''; do
-    pushd "${SCRIPT_DIR}/../$mod" > /dev/null
+    cd "${ROOT}/$mod"
     git clean -xdf -e 'local.*' -e '.idea' -e 'lite-core'
-    popd > /dev/null
 done
+
+popd > /dev/null 2>&1
+
