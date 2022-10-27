@@ -684,7 +684,7 @@ mkdir -p "${ARTIFACTS_DIR}"
         failure {
             mail to: 'mobile_dev_java@couchbase.com',
                 subject: "Java build failed",
-                body: "JAVA build ${VERSION}-${EDITION}-${BLD_NUM} faild"
+                body: "JAVA build ${VERSION}-${EDITION}-${BLD_NUM} failed"
         }
     }
 }
