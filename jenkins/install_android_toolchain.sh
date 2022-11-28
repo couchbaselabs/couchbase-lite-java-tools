@@ -7,7 +7,7 @@
 #    ANDROID_HOME - the root of the android sdk.
 
 # These versions must match the versions in lib/build.gradle
-BUILD_TOOLS_VERSION='33.0.0'
+BUILD_TOOLS_VERSION='33.0.1'
 NDK_VERSION='25.0.8775105'
 NINJA_VERSION="1.10.2"
 CMAKE_VERSION='3.23.0'
