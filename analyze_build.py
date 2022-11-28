@@ -40,7 +40,7 @@ def analyze_java_tests(platform, root):
     print("Checking platform: {platform}".format(platform=platform))
     reports = [name for name in os.listdir(root) if
                name.endswith(".xml") and os.path.isfile(os.path.join(root, name))]
-    if len(reports) <= 1:
+    if len(reports) < 1:
         raise Exception("No test reports for " + platform)
     for file in reports:
         check_tests(root, file)
@@ -49,8 +49,8 @@ def analyze_java_tests(platform, root):
 
 def analyze_android_tests(root):
     reports = [name for name in os.listdir(root) if
-               name.endswith("-test-.xml") and os.path.isfile(os.path.join(root, name))]
-    if len(reports) <= 1:
+               name.endswith("test-.xml") and os.path.isfile(os.path.join(root, name))]
+    if len(reports) < 1:
         raise Exception("No test reports for android")
     for file in reports:
         print("Checking android device: {device}".format(device=file[5:-10].replace(" ", "")))
