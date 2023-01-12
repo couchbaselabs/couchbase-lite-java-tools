@@ -1,1 +1,11 @@
+
+
+# OSX
+.DS_Store
+
+# Keystore files
+*.jks
+
+# Python stuff
 __pycache*
+
