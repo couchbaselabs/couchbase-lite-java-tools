@@ -1,4 +1,11 @@
 
+NOTE: This information is duplicated on the internal Wiki, here:
+
+https://hub.internal.couchbase.com/confluence/display/cbeng/CBM+Device+Inventory+List
+
+If you make changes to this file, please update that page as well.
+
+
 
 ################ SANTA CLARA
 
