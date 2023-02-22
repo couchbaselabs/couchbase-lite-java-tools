@@ -5,7 +5,7 @@ ROOT_DIR="${SCRIPT_DIR}/.."
 
 function usage() {
     echo "Usage: $0 <build-id>"
-    echo "       <build-id> Core build id, e.g., 3.1.0-119"
+    echo "       <build-id> Core build id, e.g., 3.2.0-119"
     exit 1
 }
 

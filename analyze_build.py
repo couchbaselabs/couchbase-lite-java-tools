@@ -58,11 +58,11 @@ def analyze_android_tests(root):
         print()
 
 
-def check_java(build_num):
+def check_java(version, build_num):
     for platform in JAVA_VARIANTS:
         try:
             fetch_reports(
-                "couchbase-lite-java/3.1.0/{n}/test-reports-{platform}-ee.zip".format(n=build_num, platform=platform))
+                "couchbase-lite-java/{v}/{n}/test-reports-{platform}-ee.zip".format(v=version, n=build_num, platform=platform))
             analyze_java_tests(platform, "test/raw")
         except Exception as e:
             print(str(e))
@@ -71,9 +71,9 @@ def check_java(build_num):
 
 
 # should print the device name, somehow?
-def check_android(build_num):
+def check_android(version, build_num):
     try:
-        fetch_reports("couchbase-lite-android/3.1.0/{n}/test-reports-android-ee.zip".format(n=build_num))
+        fetch_reports("couchbase-lite-android/{v}/{n}/test-reports-android-ee.zip".format(v=version, n=build_num))
         analyze_android_tests("connected/raw")
     except Exception as e:
         print(str(e))
@@ -83,13 +83,14 @@ def check_android(build_num):
 
 def main():
     parser = argparse.ArgumentParser(description='Analyze')
-    parser.add_argument('-a', '--android', type=int, help='Android build to be analyzed')
-    parser.add_argument('-j', '--java', type=int, help='Java build to be analyzed')
+    parser.add_argument('-v', '--version', help='CBL version to be analyzed')
+    parser.add_argument('-a', '--android', type=int, help='Android build # to be analyzed')
+    parser.add_argument('-j', '--java', type=int, help='Java build # to be analyzed')
 
     args = parser.parse_args()
 
-    if not (args.android or args.java):
-        print("Must supply at least one of android or java build number")
+    if not args.version or not (args.android or args.java):
+        print("Must supply a version and at least one of android or java build number")
         parser.print_usage()
         exit(-1)
 
@@ -101,10 +102,10 @@ def main():
             os.chdir(WORKING_DIR)
 
             if args.android:
-                check_android(args.android)
+                check_android(args.version, args.android)
 
             if args.java:
-                check_java(args.java)
+                check_java(args.version, args.java)
         finally:
             os.chdir("../")
 
