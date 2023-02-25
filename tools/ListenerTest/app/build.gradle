@@ -1,0 +1,65 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+// Set true to use mavenLocal instead of Proget
+def USE_LOCAL_MAVEN = project.hasProperty("useLocalMaven")
+
+android {
+    namespace 'com.couchbase.android.listenertest'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.couchbase.android.listenertest"
+        minSdk 22
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {jvmTarget = '1.8' }
+
+    buildFeatures {viewBinding true }
+}
+
+repositories {
+    if (USE_LOCAL_MAVEN) { mavenLocal() }
+    else {
+        maven {
+            url "https://proget.sc.couchbase.com/maven2/internalmaven/"
+            allowInsecureProtocol = true
+        }
+    }
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.9.0'
+
+    // Dependency injection
+    implementation "io.insert-koin:koin-core:3.2.1"
+    implementation "io.insert-koin:koin-android:3.2.1"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.8.0'
+
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+
+    // Couchbase
+    implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:${CBL_VERSION}"
+}
