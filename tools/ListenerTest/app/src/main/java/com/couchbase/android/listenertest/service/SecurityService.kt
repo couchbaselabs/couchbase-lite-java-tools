@@ -31,15 +31,6 @@ const val EXTERNAL_KEY_ALIAS = "test"
 const val SERVER_KEY_ALIAS = "test-server"
 
 class SecurityService {
-    companion object {
-        val X509_ATTRIBUTES = mapOf(
-            TLSIdentity.CERT_ATTRIBUTE_COMMON_NAME to "CBL Test",
-            TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION to "Couchbase",
-            TLSIdentity.CERT_ATTRIBUTE_ORGANIZATION_UNIT to "Mobile",
-            TLSIdentity.CERT_ATTRIBUTE_EMAIL_ADDRESS to "lite@couchbase.com"
-        )
-    }
-
     private var platformKeyStore: AtomicReference<KeyStore?> = AtomicReference()
     private var externalKeyStore: AtomicReference<KeyStore?> = AtomicReference()
 
@@ -56,7 +47,7 @@ class SecurityService {
 
     private fun loadIdentity(alias: String): TLSIdentity {
         loadExternalKey(alias)
-        return TLSIdentity.getIdentity(alias) ?: throw IllegalStateException("No such keystore entry: " + alias)
+        return TLSIdentity.getIdentity(alias) ?: throw IllegalStateException("No such keystore entry: ${alias}")
     }
 
     private fun loadExternalKey(alias: String) {

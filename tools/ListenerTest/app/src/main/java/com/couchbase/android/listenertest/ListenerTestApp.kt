@@ -21,6 +21,7 @@ import com.couchbase.android.listenertest.service.DatabaseService
 import com.couchbase.android.listenertest.service.ListenerService
 import com.couchbase.android.listenertest.service.ReplicatorService
 import com.couchbase.android.listenertest.service.SecurityService
+import com.couchbase.android.listenertest.service.WorkerService
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext
@@ -29,7 +30,7 @@ import java.net.NetworkInterface
 
 class ListenerTestApp : Application() {
     companion object {
-        private const val TAG = "APP"
+        private const val TAG = "TEST/APP"
     }
 
     override fun onCreate() {
@@ -47,8 +48,11 @@ class ListenerTestApp : Application() {
                     single { SecurityService() as SecurityService }
                     single { ReplicatorService(get(), get()) as ReplicatorService }
                     single { ListenerService(get(), get()) as ListenerService }
+                    single { WorkerService(get()) as WorkerService }
 
-                    viewModel { MainViewModel(get(), get()) }
+                    viewModel { ServerViewModel(get()) }
+                    viewModel { ClientViewModel(get()) }
+                    viewModel { WorkerViewModel(get()) }
                 })
         }
 

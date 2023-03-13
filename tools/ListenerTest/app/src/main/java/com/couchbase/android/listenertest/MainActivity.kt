@@ -21,15 +21,16 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(rootBinding.toolbar)
 
         val viewPager = contentBinding.viewpager
-        viewPager.adapter = MainPagerAdapter(this, 2)
+        viewPager.adapter = MainPagerAdapter(this, 3)
 
         val mediator = TabLayoutMediator(contentBinding.slidingTabs, viewPager) { tab, pos ->
             tab.setText(
                 when (pos) {
                     0 -> R.string.client
                     1 -> R.string.server
+                    2 -> R.string.worker
                     else -> {
-                        Log.w("MEDIATOR", "Page index out of bounds: $pos")
+                        Log.w("TEST/MEDIATOR", "Page index out of bounds: $pos")
                         throw IllegalStateException("Page index out of bounds: $pos")
                     }
                 }
@@ -40,16 +41,16 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class MainPagerAdapter(activity: FragmentActivity?, private val pageCount: Int) :
-    FragmentStateAdapter(activity!!) {
+class MainPagerAdapter(activity: FragmentActivity, private val pageCount: Int) : FragmentStateAdapter(activity) {
     override fun getItemCount() = pageCount
 
     override fun createFragment(pos: Int): Fragment {
         return when (pos) {
             0 -> ClientFragment()
             1 -> ServerFragment()
+            2 -> WorkerFragment()
             else -> {
-                Log.w("ADAPTER", "Page index out of bounds: $pos")
+                Log.w("TEST/ADAPTER", "Page index out of bounds: $pos")
                 throw IllegalStateException("Page index out of bounds: $pos")
             }
         }

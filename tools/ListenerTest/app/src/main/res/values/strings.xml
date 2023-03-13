@@ -23,5 +23,6 @@
 
     <!-- Messages -->
     <string name="badChoice">Please choose listener or replicator</string>
+    <string name="worker">worker</string>
 
 </resources>

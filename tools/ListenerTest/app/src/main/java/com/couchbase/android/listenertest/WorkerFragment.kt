@@ -23,34 +23,34 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.couchbase.android.listenertest.databinding.FragmentServerBinding
+import androidx.lifecycle.LiveData
+import com.couchbase.android.listenertest.databinding.FragmentWorkerBinding
+import com.couchbase.android.listenertest.service.ServiceState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ServerFragment : Fragment() {
+class WorkerFragment : Fragment() {
     companion object {
-        private const val TAG = "TEST/SERVE_UI"
+        private const val TAG = "TEST/WORK_UI"
     }
 
-    private val model by viewModel<ServerViewModel>()
-    private var viewBinding: FragmentServerBinding? = null
+    private val model by viewModel<WorkerViewModel>()
+    private var viewBinding: FragmentWorkerBinding? = null
+    private var stateObservable: LiveData<ServiceState?>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View {
-        val binding = FragmentServerBinding.inflate(layoutInflater, container, false)
+        val binding = FragmentWorkerBinding.inflate(layoutInflater, container, false)
 
-        binding.port.addTextChangedListener(object : TextWatcher {
+        binding.target.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
-            override fun afterTextChanged(s: Editable?) {
-                enableButtons()
-            }
+            override fun afterTextChanged(s: Editable?) = enableButtons()
         })
 
-        binding.startServer.setOnClickListener { startServer() }
-        binding.stopServer.setOnClickListener { stopServer() }
+        binding.startClient.setOnClickListener { startClient() }
+        binding.stopClient.setOnClickListener { stopClient() }
 
         viewBinding = binding
 
@@ -59,33 +59,37 @@ class ServerFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        model.listenerState.observe(this, this::onStateChanged)
-        model.listenerError.observe(this, this::onError)
+        observeWorkerState(model.attach())
     }
 
-    private fun startServer() {
-        val port = viewBinding?.port?.text?.toString()?.toIntOrNull() ?: return
-        model.startListener(port, viewBinding?.tls?.isChecked ?: false)
+    private fun startClient() {
+        val url = viewBinding?.target?.text?.toString() ?: return
+        observeWorkerState(model.startWorker(url))
         enableButtons()
     }
 
-    private fun stopServer() {
-        model.stopListener()
+    private fun stopClient() {
+        observeWorkerState(model.stopWorker())
         enableButtons()
     }
 
     private fun enableButtons() {
-        val running = model.listenerState.value != null
-        viewBinding?.stopServer?.isEnabled = running
-        viewBinding?.startServer?.isEnabled = (!running) && ((viewBinding?.port?.text?.length ?: -1) > 0)
+        val running = model.isRunning
+        viewBinding?.stopClient?.isEnabled = running
+        viewBinding?.startClient?.isEnabled = (!running) && ((viewBinding?.target?.text?.length ?: -1) > 5)
 
     }
 
-    private fun onStateChanged(state: String?) {
+    private fun onStateChanged(state: ServiceState?) {
         Log.d(TAG, "state change: ${state}")
-        viewBinding?.serverState?.text = state
+        if (state == null) return
+        viewBinding?.clientState?.text = state.toString()
         enableButtons()
     }
 
-    private fun onError(errMessage: String) = Toast.makeText(activity, errMessage, Toast.LENGTH_SHORT).show()
+    private fun observeWorkerState(observable: LiveData<ServiceState?>?) {
+        stateObservable?.removeObserver(this::onStateChanged)
+        stateObservable = observable
+        observable?.observe(viewLifecycleOwner, this::onStateChanged)
+    }
 }

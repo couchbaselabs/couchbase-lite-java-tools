@@ -31,10 +31,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ClientFragment : Fragment() {
     companion object {
-        private const val TAG = "CLIENT"
+        private const val TAG = "TEST/CLIENT_UI"
     }
 
-    private val model by viewModel<MainViewModel>()
+    private val model by viewModel<ClientViewModel>()
     private var viewBinding: FragmentClientBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View {

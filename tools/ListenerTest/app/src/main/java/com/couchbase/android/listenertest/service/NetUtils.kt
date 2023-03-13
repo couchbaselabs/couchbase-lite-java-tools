@@ -27,6 +27,10 @@ import java.net.URLEncoder
 
 
 class INetAddressComparator : Comparator<InetAddress> {
+    companion object {
+        const val TAG = "TEST/NET_SVC"
+    }
+
     enum class Scope { LOOPBACK, LOCAL, ROUTABLE }
 
     override fun compare(a1: InetAddress, a2: InetAddress) = when {
@@ -42,8 +46,20 @@ class INetAddressComparator : Comparator<InetAddress> {
     }
 }
 
+fun URI.isTls() = "wss" == this.scheme.lowercase()
+
+fun String.asUri(): URI {
+    val uri = URI(this).normalize()
+    return when (uri.scheme) {
+        "wss", "ws" -> uri
+        else -> throw URISyntaxException(this, "URI must have scheme ws: or wss:")
+    }
+}
+
 // Try to be like LiteCore
 fun URLEndpointListener.constructUrls(): List<URI> {
+    Log.w(INetAddressComparator.TAG, "Using local URI construction")
+
     val port = this.port
     val config = this.config
     val dbName = config.database.name
@@ -51,15 +67,18 @@ fun URLEndpointListener.constructUrls(): List<URI> {
     val comparator = INetAddressComparator()
     return NetworkInterface.getNetworkInterfaces().toList().mapNotNull {
         // get a sorted list of addresses, per up interface
-        if (!it.isUp) { null }
-        else { it.inetAddresses.toList().sortedWith(comparator) }
+        if (!it.isUp) {
+            null
+        } else {
+            it.inetAddresses.toList().sortedWith(comparator)
+        }
     }
         // remove any empty lists
-        .mapNotNull { if (it.isNotEmpty()) it else null }
+        .mapNotNull { it.ifEmpty { null } }
         // sort the lists of addresses by their first address
         .sortedWith { a, b -> comparator.compare(a.first(), b.first()) }
         // flatten the lists
-        .flatMap { it }
+        .flatten()
         // convert the addresses to URLs
         .mapNotNull { addr ->
             val addrStr = if (addr is Inet4Address) {
@@ -76,7 +95,7 @@ fun URLEndpointListener.constructUrls(): List<URI> {
             try {
                 URI("${scheme}://${addrStr}:${port}/${dbName}")
             } catch (err: URISyntaxException) {
-                Log.d("LOCAL_URL", "Bad URL from: ${addrStr}", err)
+                Log.d(INetAddressComparator.TAG, "Bad URL from: ${addrStr}", err)
                 null
             }
         }

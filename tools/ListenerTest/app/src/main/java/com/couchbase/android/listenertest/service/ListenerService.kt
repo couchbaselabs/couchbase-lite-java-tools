@@ -36,39 +36,40 @@ private class ObservableListener(val listener: URLEndpointListener) {
     }
 }
 
-class ListenerService(private val db: DatabaseService, private val security: SecurityService) {
+class ListenerService(private val dbSvc: DatabaseService, private val secureSvc: SecurityService) {
     companion object {
-        internal const val TAG = "LISTEN"
+        internal const val TAG = "TEST/LISTEN_SVC"
     }
 
     private var observableListener: ObservableListener? = null
 
     fun startListener(port: Int, useTls: Boolean): Flow<String?> {
+        val collections = dbSvc.getCollections(this)
         val listener = ObservableListener(
             URLEndpointListener(
                 URLEndpointListenerConfigurationFactory.newConfig(
-                    collections = db.getCollections(this),
+                    collections = collections,
                     port = port,
                     disableTls = !useTls,
-                    authenticator = if (useTls) null else security.listenerAuthenticator,
-                    identity = if (!useTls) null else security.serverIdentity
+                    authenticator = if (useTls) null else secureSvc.listenerAuthenticator,
+                    identity = if (!useTls) null else secureSvc.serverIdentity
                 )
             )
         )
 
         this.observableListener = listener
-
-        Log.d(TAG, "Starting listener @${port} ${if (!useTls) "" else "tls"} ")
         return callbackFlow {
             listener.registerObserver { trySend(it) }
+            Log.d(TAG, "Starting listener @${port} ${if (!useTls) "" else "tls"} ")
             listener.start()
-            awaitClose { observableListener?.stop() }
+            collections.forEach { it.close() }
+            awaitClose { }
         }
     }
 
     fun stopListener() {
         Log.d(TAG, "Stopping listener")
         observableListener?.stop()
-        db.closeDb(this)
+        dbSvc.closeDb(this)
     }
 }

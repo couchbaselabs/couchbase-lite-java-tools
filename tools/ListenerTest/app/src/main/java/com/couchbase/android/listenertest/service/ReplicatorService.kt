@@ -15,9 +15,9 @@ import java.net.URI
 
 enum class ServiceState { STOPPED, RUNNING, CONNECTED }
 
-class ReplicatorService(private val db: DatabaseService, private val security: SecurityService) {
+class ReplicatorService(private val dbSvc: DatabaseService, private val secureSvc: SecurityService) {
     companion object {
-        private const val TAG = "REPL"
+        private const val TAG = "TEST/REPL_SVC"
     }
 
     private var replicator: Replicator? = null
@@ -25,14 +25,14 @@ class ReplicatorService(private val db: DatabaseService, private val security: S
     fun startReplicator(uri: URI): Flow<ServiceState> {
         Log.d(TAG, "Starting replicator @${uri}")
 
-        val useTls = uri.scheme == "wss"
+        val useTls = uri.isTls()
         val repl = Replicator(
             ReplicatorConfigurationFactory.newConfig(
                 target = URLEndpoint(uri),
-                collections = mapOf(db.getCollections(this) to null),
+                collections = mapOf(dbSvc.getCollections(this) to null),
                 continuous = true,
-                authenticator = if (useTls) null else security.clientAuthenticator,
-                pinnedServerCertificate = if (!useTls) null else security.serverCert
+                authenticator = if (useTls) null else secureSvc.clientAuthenticator,
+                pinnedServerCertificate = if (!useTls) null else secureSvc.serverCert
             )
         )
 

@@ -32,7 +32,7 @@ class DatabaseService(app: ListenerTestApp) {
     private var databases: MutableMap<Class<*>, Database> = mutableMapOf()
 
     init {
-        CouchbaseLite.init(app)
+        CouchbaseLite.init(app, true)
 
         val consoleLogger = Database.log.console
         consoleLogger.level = LogLevel.DEBUG
@@ -42,13 +42,15 @@ class DatabaseService(app: ListenerTestApp) {
     }
 
     companion object {
-        private const val TAG = "DB"
+        private const val TAG = "TEST/DB_SVC"
 
         val collectionNames = setOf("apples", "oranges")
     }
 
+    fun getDb(requester: Any) = getDatabase(requester)
+
     fun getCollections(requester: Any): Set<Collection> {
-        val db = getDb(requester)
+        val db = getDatabase(requester)
         return collections(db)
     }
 
@@ -58,7 +60,7 @@ class DatabaseService(app: ListenerTestApp) {
         }
     }
 
-    private fun getDb(requester: Any): Database {
+    private fun getDatabase(requester: Any): Database {
         val klass = requester::class.java
         val n: Int
         val db = synchronized(databases) {
