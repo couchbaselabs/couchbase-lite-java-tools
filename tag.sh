@@ -20,13 +20,14 @@ esac
 
 VERSION=$2
 case $VERSION in
-   +([0-9]).+([0-9])*) ;;
+   @([2-4]).@([0-9])?([0-9]));;
    *) usage;;
 esac
 
 SUFFIX=$3
 
 TAG="${PLATFORM}/${VERSION}"
+if [[ "x${SUFFIX}" != "x" ]]; then TAG="${TAG}-${SUFFIX}"; fi
 
 pushd "$SCRIPT_DIR/.." > /dev/null 2>&1
 ROOT=`pwd`
