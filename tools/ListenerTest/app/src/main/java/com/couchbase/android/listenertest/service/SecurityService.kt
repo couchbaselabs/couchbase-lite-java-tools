@@ -21,7 +21,6 @@ import com.couchbase.lite.TLSIdentity
 import com.couchbase.lite.internal.utils.PlatformUtils
 import java.security.KeyStore
 import java.security.cert.X509Certificate
-import java.util.concurrent.atomic.AtomicReference
 
 
 const val EXTERNAL_KEY_STORE = "teststore.p12"
@@ -31,9 +30,6 @@ const val EXTERNAL_KEY_ALIAS = "test"
 const val SERVER_KEY_ALIAS = "test-server"
 
 class SecurityService {
-    private var platformKeyStore: AtomicReference<KeyStore?> = AtomicReference()
-    private var externalKeyStore: AtomicReference<KeyStore?> = AtomicReference()
-
     val clientAuthenticator = BasicAuthenticator("daniel", "123".toCharArray())
     val listenerAuthenticator = ListenerPasswordAuthenticator { user, pwd ->
         (user == "daniel") && (String(pwd) == "123")
@@ -62,32 +58,17 @@ class SecurityService {
     }
 
     private fun loadExternalKeyStore(): KeyStore {
-        var ks = externalKeyStore.get()
-        if (ks != null) {
-            return ks
+        val keyStore = KeyStore.getInstance(EXTERNAL_KEY_STORE_TYPE)
+        PlatformUtils.getAsset(EXTERNAL_KEY_STORE).use { keyStream ->
+            keyStore.load(keyStream, EXTERNAL_KEY_PASSWORD.toCharArray())
         }
 
-        ks = KeyStore.getInstance(EXTERNAL_KEY_STORE_TYPE)
-        if (externalKeyStore.compareAndSet(null, ks)) {
-            PlatformUtils.getAsset(EXTERNAL_KEY_STORE).use { keyStream ->
-                ks.load(keyStream, EXTERNAL_KEY_PASSWORD.toCharArray())
-            }
-        }
-
-        return externalKeyStore.get()!!
+        return keyStore
     }
 
     private fun loadPlatformKeyStore(): KeyStore {
-        var ks = platformKeyStore.get()
-        if (ks != null) {
-            return ks
-        }
-
-        ks = KeyStore.getInstance("AndroidKeyStore")
-        if (platformKeyStore.compareAndSet(null, ks)) {
-            ks.load(null)
-        }
-
-        return platformKeyStore.get()!!
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+        return keyStore
     }
 }

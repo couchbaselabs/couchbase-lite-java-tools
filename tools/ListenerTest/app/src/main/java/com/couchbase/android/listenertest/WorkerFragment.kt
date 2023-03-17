@@ -82,7 +82,7 @@ class WorkerFragment : Fragment() {
 
     private fun onStateChanged(state: ServiceState?) {
         Log.d(TAG, "state change: ${state}")
-        if (state == null) return
+        state ?: return
         viewBinding?.clientState?.text = state.toString()
         enableButtons()
     }
@@ -90,6 +90,6 @@ class WorkerFragment : Fragment() {
     private fun observeWorkerState(observable: LiveData<ServiceState?>?) {
         stateObservable?.removeObserver(this::onStateChanged)
         stateObservable = observable
-        observable?.observe(viewLifecycleOwner, this::onStateChanged)
+        if (viewBinding != null) observable?.observe(viewLifecycleOwner, this::onStateChanged)
     }
 }

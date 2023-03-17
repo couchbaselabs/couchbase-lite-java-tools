@@ -91,6 +91,7 @@ class DatabaseService(app: ListenerTestApp) {
                 val doc = MutableDocument()
                 Log.d(TAG, "Adding document ${doc.id} to ${coll}")
                 coll.save(doc)
+                coll.close()
             }
         }
 
