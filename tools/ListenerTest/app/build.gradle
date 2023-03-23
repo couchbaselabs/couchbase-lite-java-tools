@@ -8,7 +8,16 @@ def USE_LOCAL_MAVEN = project.hasProperty("useLocalMaven")
 
 android {
     namespace 'com.couchbase.android.listenertest'
-    compileSdk 33
+
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    kotlinOptions { jvmTarget = '1.8' }
 
     defaultConfig {
         applicationId "com.couchbase.android.listenertest"
@@ -24,11 +33,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions { jvmTarget = '1.8' }
 
     buildFeatures { viewBinding true }
 }
