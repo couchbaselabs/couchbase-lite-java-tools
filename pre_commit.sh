@@ -6,12 +6,13 @@ ROOT=`pwd`
 
 for mod in legal etc common ce "."; do
    cd "$ROOT/$mod"
+   git remote prune origin
    git fetch
    echo ""
    echo ""
-   echo "#####################################################"
-   echo "### `pwd`"
-   echo "#####################################################"
+   echo "##########################"
+   echo "###     $mod"
+   echo "##########################"
    echo ""
    git status
    echo "================================================"
