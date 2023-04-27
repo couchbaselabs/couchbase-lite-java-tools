@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http`://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.couchbase.mobile.test</groupId>
+  <artifactId>couchbase-mobile-test</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <licenses>
+    <license>
+      <name>Couchbase Community Edition License Agreement</name>
+      <url>http://www.couchbase.com/agreement/community</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <name>com.couchbase.lite:couchbase-mobile-test</name>
+  <description>This is a test of the Couchbase Lite system.  It is not an actual alert</description>
+  <url>http://developer.couchbase.com/mobile/</url>
+
+  <developers>
+    <developer>
+      <name>mobile</name>
+      <email>mobile@couchbase.com</email>
+      <organization>Couchbase</organization>
+      <organizationUrl>http://www.couchbase.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <repositories>
+    <repository>
+      <id>couchbase-ext</id>
+      <name>External Couchbase Proget</name>
+      <url>https://mobile.maven.couchbase.com/maven2/dev/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.couchbase.lite</groupId>
+      <artifactId>couchbase-lite-java-ee</artifactId>
+      <version>3.1.0</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
