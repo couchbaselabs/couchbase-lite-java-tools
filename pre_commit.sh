@@ -7,7 +7,7 @@ ROOT=`pwd`
 for mod in legal etc common ce "."; do
    cd "$ROOT/$mod"
    git remote prune origin
-   git fetch
+   git fetch -p -P
    echo ""
    echo ""
    echo "##########################"
