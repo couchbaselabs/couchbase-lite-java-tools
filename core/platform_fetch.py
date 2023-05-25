@@ -16,7 +16,7 @@ def subdirectory_for_variant(os: str, abi: str):
     """
 
     if os == "macos":
-        abi = "x86_64"
+        abi = "universal"
 
     return f"{os}/{abi}"
 
