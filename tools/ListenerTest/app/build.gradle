@@ -50,6 +50,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly "com.github.spotbugs:spotbugs-annotations:4.7.3"
+
     implementation 'androidx.core:core-ktx:1.9.0'
 
     // Dependency injection
