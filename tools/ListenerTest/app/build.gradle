@@ -38,6 +38,7 @@ android {
 }
 
 repositories {
+//    maven { url "https://mobile.maven.couchbase.com/maven2/dev/" }
     if (USE_LOCAL_MAVEN) { mavenLocal() }
     else {
         maven {
@@ -50,9 +51,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.github.spotbugs:spotbugs-annotations:4.7.3"
-
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
 
     // Dependency injection
     implementation "io.insert-koin:koin-core:3.3.3"
@@ -62,11 +61,11 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
 
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
 
-    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
 
     // Couchbase
     implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:${CBL_VERSION}"
