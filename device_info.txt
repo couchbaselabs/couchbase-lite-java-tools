@@ -9,6 +9,16 @@ If you make changes to this file, please update that page as well.
 
 ################ SANTA CLARA
 
+=============== Google Pixel 6a: 2022/7
+Couchbase
+https://www.gsmarena.com/google_pixel_6a-11229.php
+[ro.serialno]: [2B141JEGR04407]
+[ro.product.manufacturer]: [Google]
+[ro.product.model]: [Pixel 6a]
+[ro.product.name]: [bluejay]
+[ro.hardware]: [bluejay]
+[ro.build.version.sdk]: [33]
+
 =============== Samsung Galaxy S20: 2020/10
 Couchbase
 https://www.gsmarena.com/samsung_galaxy_s20_fe_5g-10377.php
@@ -43,6 +53,7 @@ https://www.gsmarena.com/samsung_galaxy_s9-8966.php
 [ro.build.version.sdk]: [29 (29)]
 
 =============== Xiaomi Redmi 9A: 2020/07
+!!! Not in use
 Couchbase
 https://www.gsmarena.com/xiaomi_redmi_9a-10279.php
 [ro.serialno]: [LFKVVG6XW8XSKZRC]
