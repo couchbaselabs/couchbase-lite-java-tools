@@ -413,11 +413,9 @@ ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
-./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+./etc/jenkins/publish_linux.sh "${BLD_NUM}" || exit $?
 '''
             }
-
-            // Should we be publishing Linux intermediates?
         }
 
         stage('Platform Tests') {
@@ -663,18 +661,22 @@ mkdir -p "${REPORTS_DIR}"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         stage('Publish final artifacts') {
+            environment { MAVEN_REPO = credentials('ProgetPkgPromotionKey') }
             steps {
-                // This *MUST* republish the same bits that were
-                // published above, in the Linux: Publish to ciMaven
-                // step.  This really should just promote the ciMaven
-                // bits to internalMaven but, apparently, we can't
-                // afford a real version of proget.
-
+                script { env.PROGET_PROMOTION_TOKEN = pwd(MAVEN_REPO) }
                 // Publish to Maven
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
-export PATH="${JAVA_HOME}/bin:$PATH"
+export BIN_DIR="${WORKSPACE}/bin"
+
+export JAVA_HOME="${BIN_DIR}/openjdk-17.0.7+7"
+export PATH="${JAVA_HOME}/bin:${PATH}"
+
+# put cbdeps on the path (again)
+PATH="${BIN_DIR}:${PATH}"
+
+cbdep install -d "${BIN_DIR}" mvn 3.9.2
+export PATH="${BIN_DIR}/mvn-3.9.2/bin:${PATH}"
 
 cd "${BUILD_DIR}"
 
@@ -682,7 +684,11 @@ ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
-./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" internalmaven || exit $?
+# generate the release
+./etc/jenkins/release.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+
+# generate the coverage report
+./etc/jenkins/coverage.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" || true
 '''
                 }
 
