@@ -413,7 +413,7 @@ ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
-./etc/jenkins/publish_linux.sh "${BLD_NUM}" || exit $?
+./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
 '''
             }
         }
@@ -657,7 +657,7 @@ mkdir -p "${REPORTS_DIR}"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////   P U B L I S H   ////////////////////////////////////////////////
+////////////////////////////////////////////////   R E L E A S E  /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         stage('Publish final artifacts') {
@@ -685,10 +685,18 @@ rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
 # generate the release
-./etc/jenkins/release.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+if [[ -x ./etc/jenkins/release.sh ]]; then
+    # the new way....
+    ./etc/jenkins/release.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+else
+    # the old  way....
+    ./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" internalmaven || exit $?
+fi
 
 # generate the coverage report
-./etc/jenkins/coverage.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" || true
+if [[ -x ./etc/jenkins/coverage.sh ]]; then
+    ./etc/jenkins/coverage.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" || true
+fi
 '''
                 }
 
