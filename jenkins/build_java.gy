@@ -60,6 +60,7 @@ pipeline {
         // ??? Doesn't work
         // buildDiscarder(logRotator(numToKeepStr: '10'))
         skipDefaultCheckout(true)
+        timeout(time: 2, unit: 'HOURS') 
     }
     stages {
         stage('Set build name') {
