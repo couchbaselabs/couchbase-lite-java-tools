@@ -6,7 +6,7 @@ plugins {
 }
 
 ext {
-    COMPILE_SDK_VERSION = 34
+    COMPILE_SDK_VERSION = 33
     BUILD_TOOLS_VERSION = '34.0.0'
 
     CBL_VERSION='3.2.0-SNAPSHOT'
