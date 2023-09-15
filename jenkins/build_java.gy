@@ -109,7 +109,7 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                 // Run checks
                 sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -176,7 +176,7 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                                 // Run the build
                                 sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -204,7 +204,7 @@ echo "======== OSX: Build in `pwd`"
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                     sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -380,7 +380,7 @@ if ($LASTEXITCODE -ne 0) {
         stage('Linux: Build') {
             steps {
                 sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -401,20 +401,17 @@ echo "======== Linux: Build in `pwd`"
                 }
 
                 sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
-
-# pull the lack duck nonsense.
-curl -Lfs https://raw.githubusercontent.com/couchbase/product-metadata/master/couchbase-lite-java/blackduck/${VERSION}/notices.txt -o notices.txt || true
 
 echo "======== Linux: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
-./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+./etc/jenkins/publish_linux.sh "${BLD_NUM}" || exit $?
 '''
             }
         }
@@ -470,7 +467,7 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                                 sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -619,7 +616,7 @@ if ($LASTEXITCODE -ne 0) {
                 // Run the tests
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
-export JAVA_HOME="${WORKSPACE}/bin//openjdk-17.0.7+7"
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -673,12 +670,6 @@ export BIN_DIR="${WORKSPACE}/bin"
 export JAVA_HOME="${BIN_DIR}/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:${PATH}"
 
-# put cbdeps on the path (again)
-PATH="${BIN_DIR}:${PATH}"
-
-cbdep install -d "${BIN_DIR}" mvn 3.9.2
-export PATH="${BIN_DIR}/mvn-3.9.2/bin:${PATH}"
-
 cd "${BUILD_DIR}"
 
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
@@ -686,18 +677,10 @@ rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
 # generate the release
-if [[ -x ./etc/jenkins/release.sh ]]; then
-    # the new way....
-    ./etc/jenkins/release.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
-else
-    # the old  way....
-    ./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" internalmaven || exit $?
-fi
+./etc/jenkins/release.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
 
 # generate the coverage report
-if [[ -x ./etc/jenkins/coverage.sh ]]; then
-    ./etc/jenkins/coverage.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" || true
-fi
+./etc/jenkins/coverage.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" || true
 '''
                 }
 
