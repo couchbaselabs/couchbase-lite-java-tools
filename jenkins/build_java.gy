@@ -60,6 +60,7 @@ pipeline {
         // ??? Doesn't work
         // buildDiscarder(logRotator(numToKeepStr: '10'))
         skipDefaultCheckout(true)
+        timeout(time: 2, unit: 'HOURS') 
     }
     stages {
         stage('Set build name') {
@@ -78,6 +79,21 @@ pipeline {
                 // Clean the workspace
                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
+                // Install Java 17 on Linux
+                sh '''#!/bin/bash
+export BIN_DIR="${WORKSPACE}/bin"
+rm -rf "${BIN_DIR}"
+mkdir -p "${BIN_DIR}"
+
+# install cbdeps and put it on the PATH
+curl https://packages.couchbase.com/cbdep/cbdep-linux-x86_64 -o "${BIN_DIR}/cbdep"
+chmod a+x "${BIN_DIR}/cbdep"
+PATH="${BIN_DIR}:${PATH}"
+
+# install openjdk 17
+cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
+'''
+
                 // Download the source
                 sh '''#!/bin/bash
 echo "======== Linux: Download source: ${SOURCE}"
@@ -93,9 +109,7 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                 // Run checks
                 sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-# trim the string...
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -132,6 +146,21 @@ echo "======== Linux: Check in `pwd`"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
+                                // Install Java 17 on OSX Build Agent
+                                sh '''#!/bin/bash
+export BIN_DIR="${WORKSPACE}/bin"
+rm -rf "${BIN_DIR}"
+mkdir -p "${BIN_DIR}"
+
+# install cbdeps and put it on the PATH
+curl https://packages.couchbase.com/cbdep/cbdep-darwin-x86_64 -o "${BIN_DIR}/cbdep"
+chmod a+x "${BIN_DIR}/cbdep"
+PATH="${BIN_DIR}:${PATH}"
+
+# install openjdk 17
+cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
+'''
+
                                 // Download the source
                                 sh '''#!/bin/bash
 echo "======== OSX: Download source: ${SOURCE}"
@@ -147,8 +176,7 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
 
                                 // Run the build
                                 sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -176,8 +204,7 @@ echo "======== OSX: Build in `pwd`"
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                     sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -234,11 +261,11 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
-                                // Install Java 11
+                                // Install Java 17 on Windows Build Agent
                                 powershell '''
-Write-Host "======== Windows: Install Java 11"
+Write-Host "======== Windows: Install Java 17"
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-.\\cbdep.exe install -d $env:WORKSPACE java 11.0.3
+.\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
 '''
                                 // Download the source
                                 powershell '''
@@ -261,7 +288,7 @@ Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
 
                                 // Run the build
                                 powershell '''
-$env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
+$env:JAVA_HOME = "$env:WORKSPACE\\openjdk-17.0.7+7"
 $env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
@@ -297,7 +324,7 @@ if ($LASTEXITCODE -ne 0) {
 
                                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                 powershell '''
-$env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
+$env:JAVA_HOME = "$env:WORKSPACE\\openjdk-17.0.7+7"
 $env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
@@ -353,8 +380,7 @@ if ($LASTEXITCODE -ne 0) {
         stage('Linux: Build') {
             steps {
                 sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -375,25 +401,19 @@ echo "======== Linux: Build in `pwd`"
                 }
 
                 sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
-
-# pull the lack duck nonsense.
-curl -Lfs https://raw.githubusercontent.com/couchbase/product-metadata/master/couchbase-lite-java/blackduck/${VERSION}/notices.txt -o notices.txt || true
 
 echo "======== Linux: Publish"
 ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
-./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+./etc/jenkins/publish_linux.sh "${BLD_NUM}" || exit $?
 '''
             }
-
-            // Should we be publishing Linux intermediates?
         }
 
         stage('Platform Tests') {
@@ -416,6 +436,21 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
+                                // Install Java 17 on OSX Test Agent
+                                sh '''#!/bin/bash
+export BIN_DIR="${WORKSPACE}/bin"
+rm -rf "${BIN_DIR}"
+mkdir -p "${BIN_DIR}"
+
+# install cbdeps and put it on the PATH
+curl https://packages.couchbase.com/cbdep/cbdep-darwin-x86_64 -o "${BIN_DIR}/cbdep"
+chmod a+x "${BIN_DIR}/cbdep"
+PATH="${BIN_DIR}:${PATH}"
+
+# install openjdk 17
+cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
+'''
+
                                 // Download the source
                                 sh '''#!/bin/bash
 echo "======== OSX: Download source: ${SOURCE}"
@@ -432,8 +467,7 @@ echo "${VERSION}" > "${CBL_ROOT}/version.txt"
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                                 sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -491,11 +525,11 @@ mkdir -p "${REPORTS_DIR}"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
-                                 // Install Java 11
+                                 // Install Java 17 on Windows Test Agent
                                 powershell '''
-Write-Host "======== Windows: Install Java 11"
+Write-Host "======== Windows: Install Java 17"
 Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
-.\\cbdep.exe install -d $env:WORKSPACE java 11.0.3
+.\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
 '''
                                 // Download the source
                                 powershell '''
@@ -519,7 +553,7 @@ Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
                                 // Run the tests
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                                 powershell '''
-$env:JAVA_HOME = "$env:WORKSPACE\\java-11.0.3"
+$env:JAVA_HOME = "$env:WORKSPACE\\openjdk-17.0.7+7"
 $env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
 
 try { Set-Location $env:BUILD_DIR }
@@ -582,8 +616,7 @@ if ($LASTEXITCODE -ne 0) {
                 // Run the tests
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
 export PATH="${JAVA_HOME}/bin:$PATH"
 
 cd "${BUILD_DIR}"
@@ -622,23 +655,20 @@ mkdir -p "${REPORTS_DIR}"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////   P U B L I S H   ////////////////////////////////////////////////
+////////////////////////////////////////////////   R E L E A S E  /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         stage('Publish final artifacts') {
+            environment { MAVEN_REPO = credentials('ProgetPkgPromotionKey') }
             steps {
-                // This *MUST* republish the same bits that were
-                // published above, in the Linux: Publish to ciMaven
-                // step.  This really should just promote the ciMaven
-                // bits to internalMaven but, apparently, we can't
-                // afford a real version of proget.
-
+                script { env.PROGET_PROMOTION_TOKEN = pwd(MAVEN_REPO) }
                 // Publish to Maven
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     sh '''#!/bin/bash
-JAVA_HOME=`java -XshowSettings:properties 2>&1 | grep java.home | cut -d= -f2`
-export JAVA_HOME=`echo $JAVA_HOME`
-export PATH="${JAVA_HOME}/bin:$PATH"
+export BIN_DIR="${WORKSPACE}/bin"
+
+export JAVA_HOME="${BIN_DIR}/openjdk-17.0.7+7"
+export PATH="${JAVA_HOME}/bin:${PATH}"
 
 cd "${BUILD_DIR}"
 
@@ -646,7 +676,11 @@ ARTIFACTS_DIR="$WORKSPACE/artifacts"
 rm -rf "${ARTIFACTS_DIR}"
 mkdir -p "${ARTIFACTS_DIR}"
 
-./etc/jenkins/publish_linux.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" internalmaven || exit $?
+# generate the release
+./etc/jenkins/release.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" "${WORKSPACE}" || exit $?
+
+# generate the coverage report
+./etc/jenkins/coverage.sh "${VERSION}" "${BLD_NUM}" "${ARTIFACTS_DIR}" || true
 '''
                 }
 
