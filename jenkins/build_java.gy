@@ -97,7 +97,7 @@ cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
                 // Download the source
                 sh '''#!/bin/bash
 echo "======== Linux: Download source: ${SOURCE}"
-curl -LO "${LATESTBUILDS}/couchbase-lite-java/${RELEASE}/${BLD_NUM}/${SOURCE}"
+curl -LO "${LATESTBUILDS}/couchbase-lite-java/${VERSION}/${BLD_NUM}/${SOURCE}"
 
 echo "======== Linux: Extract source"
 tar xzf ${SOURCE}
@@ -164,7 +164,7 @@ cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
                                 // Download the source
                                 sh '''#!/bin/bash
 echo "======== OSX: Download source: ${SOURCE}"
-curl -LO "${LATESTBUILDS}/couchbase-lite-java/${RELEASE}/${BLD_NUM}/${SOURCE}"
+curl -LO "${LATESTBUILDS}/couchbase-lite-java/${VERSION}/${BLD_NUM}/${SOURCE}"
 
 echo "======== OSX: Extract source"
 tar xzf ${SOURCE}
@@ -231,7 +231,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                                                     sshTransfer(
                                                         sourceFiles: "artifacts/*.*",
                                                         removePrefix: "artifacts",
-                                                        remoteDirectory: "couchbase-lite-java/${RELEASE}/${BLD_NUM}",
+                                                        remoteDirectory: "couchbase-lite-java/${VERSION}/${BLD_NUM}",
                                                         execCommand: ""
                                                     )
                                                 ]
@@ -270,7 +270,7 @@ Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
+try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:VERSION/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
     Exit 5
@@ -357,7 +357,7 @@ if ($LASTEXITCODE -ne 0) {
                                                     sshTransfer(
                                                         sourceFiles: "artifacts/*.*",
                                                         removePrefix: "artifacts",
-                                                        remoteDirectory: "couchbase-lite-java/${RELEASE}/${BLD_NUM}",
+                                                        remoteDirectory: "couchbase-lite-java/${VERSION}/${BLD_NUM}",
                                                         execCommand: ""
                                                     )
                                                 ]
@@ -454,7 +454,7 @@ cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
                                 // Download the source
                                 sh '''#!/bin/bash
 echo "======== OSX: Download source: ${SOURCE}"
-curl -LO "${LATESTBUILDS}/couchbase-lite-java/${RELEASE}/${BLD_NUM}/${SOURCE}"
+curl -LO "${LATESTBUILDS}/couchbase-lite-java/${VERSION}/${BLD_NUM}/${SOURCE}"
 
 echo "======== OSX: Extract source"
 tar xzf ${SOURCE}
@@ -496,7 +496,7 @@ mkdir -p "${REPORTS_DIR}"
                                                     sshTransfer(
                                                         sourceFiles: "reports/*.zip",
                                                         removePrefix: "reports",
-                                                        remoteDirectory: "couchbase-lite-java/${RELEASE}/${BLD_NUM}",
+                                                        remoteDirectory: "couchbase-lite-java/${VERSION}/${BLD_NUM}",
                                                         execCommand: ""
                                                     )
                                                 ])
@@ -534,7 +534,7 @@ Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows
                                 // Download the source
                                 powershell '''
 Write-Host "======== Windows: Download source"
-try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:RELEASE/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
+try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:VERSION/$env:BLD_NUM/$env:SOURCE", "source.tar.gz") }
 catch {
     Write-Host "Failed with error" $_.Exception.toString()
     Exit 5
@@ -588,7 +588,7 @@ if ($LASTEXITCODE -ne 0) {
                                                     sshTransfer(
                                                         sourceFiles: "reports/*.zip",
                                                         removePrefix: "reports",
-                                                        remoteDirectory: "couchbase-lite-java/${RELEASE}/${BLD_NUM}",
+                                                        remoteDirectory: "couchbase-lite-java/${VERSION}/${BLD_NUM}",
                                                         execCommand: ""
                                                     )
                                                 ])
@@ -643,7 +643,7 @@ mkdir -p "${REPORTS_DIR}"
                                     sshTransfer(
                                         sourceFiles: "reports/*.zip",
                                         removePrefix: "reports",
-                                        remoteDirectory: "couchbase-lite-java/${RELEASE}/${BLD_NUM}",
+                                        remoteDirectory: "couchbase-lite-java/${VERSION}/${BLD_NUM}",
                                         execCommand: ""
                                     )
                                 ])
@@ -697,7 +697,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                                     sshTransfer(
                                         sourceFiles: "artifacts/*.*",
                                         removePrefix: "artifacts",
-                                        remoteDirectory: "couchbase-lite-java/${RELEASE}/${BLD_NUM}",
+                                        remoteDirectory: "couchbase-lite-java/${VERSION}/${BLD_NUM}",
                                         execCommand: ""
                                     )
                                 ]
