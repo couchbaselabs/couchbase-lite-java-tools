@@ -6,13 +6,13 @@ ROOT=`pwd`
 
 for mod in etc common ce "."; do
    cd "$ROOT/$mod"
-   git remote prune origin
-   git fetch -p -P
-   echo ""
    echo ""
    echo "##########################"
    echo "###     $mod"
    echo "##########################"
+   echo ""
+   git remote prune origin
+   git fetch -p -P
    echo ""
    git status
    echo "================================================"
