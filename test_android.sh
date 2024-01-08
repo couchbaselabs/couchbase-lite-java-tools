@@ -5,7 +5,7 @@ ROOT_DIR="${SCRIPT_DIR}/.."
 
 cd "${ROOT_DIR}"
 
-for dev in `adb devices | tail +2 | cut -f1`; do
+for dev in `adb devices | tail +2 | cut -f1 | sort -r`; do
     echo "========= $dev"
     export ANDROID_SERIAL="$dev"
 
