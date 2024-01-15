@@ -13,6 +13,11 @@ for dev in `adb devices | tail +2 | cut -f1 | sort -r`; do
         adb shell pm uninstall -k --user 0 $app
     done
     
+
+    adb logcat > log.txt &
+    logger=$!
     gw :ee:android-ktx:ee_android-ktx:devTest
     cp -a ee/android-ktx/lib/build/reports/androidTests/connected ~/Desktop/"test-report-${dev}"
+    kill $logger
+    mv log.txt ~/Desktop/"test-report-${dev}"
 done
