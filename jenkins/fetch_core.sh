@@ -91,7 +91,7 @@ pip -q install GitPython
 
 echo "=== Fetching artifacts for Core-${CORE_VERSION} ${EDITION} Edition on ${PLATFORM}"
 mkdir -p "${CORE_DIR}"
-python "${ROOT_DIR}/core_tools/fetch_litecore_version.py" -x "${ROOT_DIR}/etc/core" -b "${CORE_VERSION}" -v $PLATFORM -o "${CORE_DIR}"
+python "${ROOT_DIR}/core_tools/fetch_litecore_version.py" $DEBUG_OPT -x "${ROOT_DIR}/etc/core" -b "${CORE_VERSION}" -v $PLATFORM -o "${CORE_DIR}"
 
 deactivate
 rm -rf ./.penv
