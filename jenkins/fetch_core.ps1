@@ -32,7 +32,7 @@ pip -q install GitPython
 
 Write-Host "=== Fetching artifacts for Core-${CoreVersion} on Win64"
 New-Item -Type directory -ErrorAction Ignore "${CoreDir}"
-python "${RootDir}\core_tools\fetch_litecore_version.py" -x "${RootDir}\etc\core" -b "${CoreVersion}" -v windows-win64 $DebugOpt -o "${CoreDir}"
+python "${RootDir}\core_tools\fetch_litecore_version.py" "${DebugOpt}" -x "${RootDir}\etc\core" -b "${CoreVersion}" -v windows-win64 $DebugOpt -o "${CoreDir}"
 
 deactivate
 Remove-Item .\.penv -Force  -Recurse -ErrorAction SilentlyContinue
