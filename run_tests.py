@@ -12,10 +12,10 @@ def test_java(project_root, out_dir):
     run(f"./gradlew ee:java:ee_java:devTest -Pverbose=true > test.log 2>&1", shell=True, check=False)
 
     # copy everything to a safe place
-    dest_path = f"{out_dir}/java"
+    dest_path = f"{out_dir}/test-report-Java"
     run(f"""
         cp -a ee/java/lib/build/reports/tests/test {dest_path}
-        mv test.log {dest_path}
+        mv test.log {dest_path}/log.txt
     """, shell=True, check=False)
 
 
@@ -23,18 +23,20 @@ def test_android(project_root, out_dir, devices):
     os.chdir(project_root)
 
     for dev, dev_name in devices.items():
+        print(f"====== R U N N I N G   A N D R O I D   T E S T S:   {dev_name}")
+
         # get rid of old processes
         run(f"""
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.test
+            adb -s {dev} logcat -G 512K
         """, shell=True, check=False)
 
         # start logcat
-        logger = Popen(f"adb -s {dev} logcat > {dev}.log", shell=True)
+        logger = Popen(f"adb -s {dev} logcat > test.log", shell=True)
 
         # run the tests
-        print(f"====== R U N N I N G   A N D R O I D   T E S T S:   {dev_name}")
         run(f"""
             export ANDROID_SERIAL={dev}
             ./gradlew :ee:android-ktx:ee_android-ktx:devTest
@@ -47,10 +49,10 @@ def test_android(project_root, out_dir, devices):
         logger.wait()
 
         # copy everything to a safe place
-        dest_path = f"{out_dir}/{dev_name}"
+        dest_path = f"{out_dir}/test-report-{dev_name}"
         run(f"""
             cp -a ee/android-ktx/lib/build/reports/androidTests/connected {dest_path}
-            mv {dev}.log {dest_path}/test.log
+            mv test.log {dest_path}/log.txt
         """, shell=True, check=False)
 
 
