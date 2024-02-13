@@ -79,6 +79,7 @@ https://www.gsmarena.com/google_pixel_7_pro-11908.php
 ================ Google Pixel 4A: 2020/08
 Couchbase
 https://www.gsmarena.com/google_pixel_4a-10123.php
+Battery: 3.85
 [ro.serialno]: [14151JEC204776]
 [ro.product.manufacturer]: [Google]
 [ro.product.model]: [Pixel 4a]
@@ -89,6 +90,7 @@ https://www.gsmarena.com/google_pixel_4a-10123.php
 ================ Google Pixel 2 XL: 2017/10
 Blake
 https://www.gsmarena.com/google_pixel_2_xl-8720.php
+Battery: 3.85
 [ro.serialno]: [712KPKN1048861]
 [ro.product.manufacturer]: [Google]
 [ro.product.model]: [Pixel 2 XL]
@@ -99,6 +101,7 @@ https://www.gsmarena.com/google_pixel_2_xl-8720.php
 ================ Google Nexus 6: 2014/11
 Blake
 https://www.gsmarena.com/motorola_nexus_6-6604.php
+Battery: 3.85
 [ro.serialno]: [ZX1G324JBJ]
 [ro.product.manufacturer]: [motorola]
 [ro.product.model]: [Nexus 6]
@@ -109,6 +112,7 @@ https://www.gsmarena.com/motorola_nexus_6-6604.php
 ================ Google Nexus 5: 2013/11
 Blake
 https://www.gsmarena.com/lg_nexus_5-5705.php
+Battery: 3.85
 [ro.serialno]: [0344242513ad68ab]
 [ro.product.manufacturer]: [LGE]
 [ro.product.model]: [Nexus 5]
@@ -119,6 +123,7 @@ https://www.gsmarena.com/lg_nexus_5-5705.php
 ================ Google Nexus 4: 2012/10
 Blake
 https://www.gsmarena.com/lg_nexus_4_e960-5048.php
+Battery: 3.85
 [ro.serialno]: [004c03eb5615429f]
 [ro.product.manufacturer]: [LGE]
 [ro.product.model]: [Nexus 4]
