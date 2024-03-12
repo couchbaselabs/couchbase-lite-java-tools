@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR= "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../.."
 LATESTBUILDS="http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search"
 
@@ -43,7 +43,7 @@ fetch_platform 'android-arm64-v8a' 'lib/CouchbaseLiteVectorSearch.so' 'android/a
 fetch_platform 'android-x86_64' 'lib/CouchbaseLiteVectorSearch.so' 'android/x86_64/x86_64'
 
 echo "===== OSX"
-fetch_platform 'apple' 'CouchbaseLiteVectorSearch.xcframework/macos-arm64_x86_64/CouchbaseLiteVectorSearch.framework/Versions/C/CouchbaseLiteVectorSearch' 'macos/universal/lib' 'CouchbaseLiteVectorSearch.dylib'
+fetch_platform 'apple' 'CouchbaseLiteVectorSearch.xcframework/macos-arm64_x86_64/CouchbaseLiteVectorSearch.framework/Versions/A/CouchbaseLiteVectorSearch' 'macos/universal/lib' 'CouchbaseLiteVectorSearch.dylib'
 
 echo "===== Linux"
 fetch_platform 'linux-x86_64' 'lib/CouchbaseLiteVectorSearch.so' 'linux/x86_64/lib'
