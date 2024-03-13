@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 WORKING_DIR = ".build_analysis"
-LATESTBUILDS = "http://latestbuilds.service.couchbase.com/builds/latestbuilds/"
+LATESTBUILDS = "https://latestbuilds.service.couchbase.com/builds/latestbuilds/"
 JAVA_VARIANTS = ["linux", "macos", "windows"]
 
 
