@@ -6,7 +6,7 @@ ROOT=`pwd`
 
 for mod in ce common etc ''; do
     cd "${ROOT}/$mod"
-    git clean -xdff -e 'local.*' -e '.idea' -e 'lite-core' -e 'ext-libs'
+    git clean -xdff -e 'local.*' -e '.idea' -e 'lite-core'
 done
 
 popd > /dev/null 2>&1
