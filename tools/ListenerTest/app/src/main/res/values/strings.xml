@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">ListenerTest</string>
+
+    <!-- Client Fragment -->
+    <string name="client">Client</string>
+    <string name="target">Server URL:</string>
+    <string name="defaultUrl">wss://localhost:3000/</string>
+
+    <!-- Server Fragment -->
+    <string name="server">Server</string>
+    <string name="port">Port:</string>
+    <string name="tls">Use TLS:</string>
+    <string name="defaultPort">0</string>
+
+    <!-- Buttons -->
+    <string name="start">start</string>
+    <string name="stop">stop</string>
+
+    <!-- State -->
+    <string name="stopped">stopped</string>
+    <string name="running">running</string>
+    <string name="connected">connected</string>
+
+    <!-- Messages -->
+    <string name="badChoice">Please choose listener or replicator</string>
+    <string name="worker">worker</string>
+
+</resources>

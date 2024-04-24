@@ -58,21 +58,29 @@ def test_android(project_root, out_dir, devices):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Analyze')
+    parser.add_argument('-v', '--version', choices=['helium', 'beryllium', 'boron'], help='Version code name')
+    parser.add_argument('-o', '--output', default="/Users/blakemeike/Desktop")
     parser.add_argument('-a', '--android', action='store_true', help='Run android tests')
     parser.add_argument('-j', '--java', action='store_true', help='Run java tests')
 
     args = parser.parse_args()
 
+    if not args.version or not (args.android or args.java):
+        print("Must supply a version and at least one of android or java")
+        exit(-1)
+
+    print(f"====== T E S T I N G: {args.version} to {args.output}")
+
     if args.java:
         test_java(
-            "/Users/blakemeike/Working/jak/helium",
-            "/Users/blakemeike/Desktop"
+            f"/Users/blakemeike/Working/jak/{args.version}",
+            args.output
         )
 
     if args.android:
         test_android(
-            "/Users/blakemeike/Working/jak/helium",
-            "/Users/blakemeike/Desktop",
+            f"/Users/blakemeike/Working/jak/{args.version}",
+            args.output,
             {
                 "14151JEC204776": "Pixel-4a",
                 "712KPKN1048861": "Pixel-2XL",
