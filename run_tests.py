@@ -84,7 +84,7 @@ if __name__ == "__main__":
             {
                 "14151JEC204776": "Pixel-4a",
                 "712KPKN1048861": "Pixel-2XL",
-                "ZX1G324JBJ": "Nexus-6",
+                # "ZX1G324JBJ": "Nexus-6",
                 # "0344242513ad68ab": "Nexus-5",
                 "004c03eb5615429f": "Nexus-4"
             })
