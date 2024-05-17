@@ -30,7 +30,7 @@ def test_android(project_root, out_dir, devices):
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.test
-            adb -s {dev} logcat -G 512K
+            adb -s {dev} logcat -G 1024K
         """, shell=True, check=False)
 
         # start logcat
@@ -42,7 +42,7 @@ def test_android(project_root, out_dir, devices):
             ./gradlew :ee:android-ktx:ee_android-ktx:devTest
         """, shell=True, check=False)
 
-        time.sleep(30)
+        time.sleep(10)
 
         # kill the logger
         logger.terminate()
