@@ -9,7 +9,6 @@ def USE_LOCAL_MAVEN = project.hasProperty("useLocalMaven")
 android {
     namespace 'com.couchbase.android.listenertest'
 
-    compileSdkVersion COMPILE_SDK_VERSION
     buildToolsVersion BUILD_TOOLS_VERSION
 
     compileOptions {
@@ -20,9 +19,11 @@ android {
     kotlinOptions { jvmTarget = '1.8' }
 
     defaultConfig {
-        applicationId "com.couchbase.android.listenertest"
+        compileSdk COMPILE_SDK_VERSION
         minSdk 22
         targetSdk 33
+
+        applicationId "com.couchbase.android.listenertest"
         versionCode 1
         versionName "1.0"
     }

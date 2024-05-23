@@ -33,6 +33,7 @@ class ListenerTestApp : Application() {
         private const val TAG = "TEST/APP"
     }
 
+    @Suppress("USELESS_CAST")
     override fun onCreate() {
         super.onCreate()
 
@@ -60,7 +61,7 @@ class ListenerTestApp : Application() {
         logNetInterfaces()
     }
 
-    fun logNetInterfaces() {
+    private fun logNetInterfaces() {
         NetworkInterface.getNetworkInterfaces().toList().forEach { iface ->
             iface.inetAddresses.toList().forEach { addr ->
                 Log.d(

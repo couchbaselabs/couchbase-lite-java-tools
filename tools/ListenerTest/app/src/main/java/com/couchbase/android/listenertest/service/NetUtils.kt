@@ -57,6 +57,7 @@ fun String.asUri(): URI {
 }
 
 // Try to be like LiteCore
+@Suppress("DEPRECATION")
 fun URLEndpointListener.constructUrls(): List<URI> {
     Log.w(INetAddressComparator.TAG, "Using local URI construction")
 
