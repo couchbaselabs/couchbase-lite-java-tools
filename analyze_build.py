@@ -7,6 +7,7 @@ import shutil
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
+import re
 
 WORKING_DIR = ".build_analysis"
 LATESTBUILDS = "https://latestbuilds.service.couchbase.com/builds/latestbuilds/"
@@ -72,9 +73,12 @@ def check_java(version, build_num):
 
 # should print the device name, somehow?
 def check_android(version, build_num):
+    path = "connected/raw"
+    if not re.match("^((2\\.)|(3\\.[012]))", version): 
+        path += "/debug"
     try:
         fetch_reports("couchbase-lite-android/{v}/{n}/test-reports-android-ee.zip".format(v=version, n=build_num))
-        analyze_android_tests("connected/raw")
+        analyze_android_tests(path)
     except Exception as e:
         print(str(e))
     finally:

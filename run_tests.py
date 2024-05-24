@@ -25,7 +25,7 @@ def test_android(project_root, out_dir, devices):
     for dev, dev_name in devices.items():
         print(f"====== R U N N I N G   A N D R O I D   T E S T S:   {dev_name}")
 
-        # get rid of old processes
+        # get rid of old test apps
         run(f"""
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test
