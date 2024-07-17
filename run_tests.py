@@ -25,12 +25,12 @@ def test_android(project_root, out_dir, devices):
     for dev, dev_name in devices.items():
         print(f"====== R U N N I N G   A N D R O I D   T E S T S:   {dev_name}")
 
-        # get rid of old processes
+        # get rid of old test apps
         run(f"""
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test
             adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.test
-            adb -s {dev} logcat -G 512K
+            adb -s {dev} logcat -G 1024K
         """, shell=True, check=False)
 
         # start logcat
@@ -42,7 +42,7 @@ def test_android(project_root, out_dir, devices):
             ./gradlew :ee:android-ktx:ee_android-ktx:devTest
         """, shell=True, check=False)
 
-        time.sleep(30)
+        time.sleep(10)
 
         # kill the logger
         logger.terminate()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
             {
                 "14151JEC204776": "Pixel-4a",
                 "712KPKN1048861": "Pixel-2XL",
-                "ZX1G324JBJ": "Nexus-6",
+                # "ZX1G324JBJ": "Nexus-6",
                 # "0344242513ad68ab": "Nexus-5",
                 "004c03eb5615429f": "Nexus-4"
             })
