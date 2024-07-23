@@ -52,17 +52,6 @@ https://www.gsmarena.com/samsung_galaxy_s9-8966.php
 [ro.hardware.chipname]: [SDM845]
 [ro.build.version.sdk]: [29 (29)]
 
-=============== Xiaomi Redmi 9A: 2020/07
-!!! Not in use
-Couchbase
-https://www.gsmarena.com/xiaomi_redmi_9a-10279.php
-[ro.serialno]: [LFKVVG6XW8XSKZRC]
-[ro.product.manufacturer]: [Xiaomi]
-[ro.product.model]: [M2006C3LG]
-[ro.product.name]: [dandelion_global]
-[ro.hardware]: [mt6762]
-[ro.build.version.sdk]: [29 (29)]
-
 
 ################ OLYMPIA
 
@@ -75,6 +64,18 @@ https://www.gsmarena.com/google_pixel_7_pro-11908.php
 [ro.product.name]: [cheetah]
 [ro.hardware]: [cheetah]
 [ro.build.version.sdk]: [33]
+
+
+================ Google Pixel 8: 2024/08
+Couchbase
+https://www.gsmarena.com/google_pixel_8-12546.php
+Battery: 3.85
+[ro.serialno]: [41020DLJH003HH]
+[ro.product.manufacturer]: [Google]
+[ro.product.model]: [Pixel 8]
+[ro.product.name]: [shiba]
+[ro.hardware]: [shiba]
+[ro.build.version.sdk]: [34]
 
 ================ Google Pixel 4A: 2020/08
 Couchbase
@@ -99,6 +100,7 @@ Battery: 3.85
 [ro.build.version.sdk]: [30 (30)]
 
 ================ Google Nexus 6: 2014/11
+!!! Not in use
 Blake
 https://www.gsmarena.com/motorola_nexus_6-6604.php
 Battery: 3.85
@@ -109,7 +111,19 @@ Battery: 3.85
 [ro.hardware]: [shamu]
 [ro.build.version.sdk]: [24 (25)]
 
+=============== Xiaomi Redmi 9A: 2020/07
+!!! Not in use
+Couchbase
+https://www.gsmarena.com/xiaomi_redmi_9a-10279.php
+[ro.serialno]: [LFKVVG6XW8XSKZRC]
+[ro.product.manufacturer]: [Xiaomi]
+[ro.product.model]: [M2006C3LG]
+[ro.product.name]: [dandelion_global]
+[ro.hardware]: [mt6762]
+[ro.build.version.sdk]: [29 (29)]
+
 ================ Google Nexus 5: 2013/11
+!!! Not in use
 Blake
 https://www.gsmarena.com/lg_nexus_5-5705.php
 Battery: 3.85

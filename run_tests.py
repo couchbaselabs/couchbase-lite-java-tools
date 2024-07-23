@@ -82,6 +82,7 @@ if __name__ == "__main__":
             f"/Users/blakemeike/Working/jak/{args.version}",
             args.output,
             {
+                "41020DLJH003HH": "Pixel-8",
                 "14151JEC204776": "Pixel-4a",
                 "712KPKN1048861": "Pixel-2XL",
                 # "ZX1G324JBJ": "Nexus-6",
