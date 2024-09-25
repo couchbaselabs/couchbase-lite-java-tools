@@ -74,7 +74,7 @@ def check_java(version, build_num):
 # should print the device name, somehow?
 def check_android(version, build_num):
     path = "connected/raw"
-    if not re.match("^((2\\.)|(3\\.[012]))", version): 
+    if not re.match("^((2\\.)|(3\\.[01]))", version): 
         path += "/debug"
     try:
         fetch_reports("couchbase-lite-android/{v}/{n}/test-reports-android-ee.zip".format(v=version, n=build_num))

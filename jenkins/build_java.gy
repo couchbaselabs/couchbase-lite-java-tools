@@ -1,30 +1,17 @@
 //
 //  Pipeline build for Java product
 //
+// This build, couchbase-lite-java-linux-build-pipeline, is called from
+// job couchbase-lite-java only for builds with versions 3.1.x or greater
 
 // These three methods set the tags that determine which agent will run a stage
 def static osxNode() { return "cbl-java&&macosx_x86_64" }
 
-def static windowsNode(version) {
-    switch (version) {
-        case ~/3\..+/:
-            return "cbl-java&&windows2016"
-        case ~/2\.8\../:
-            return "cbl-java&&windows2016"
-        default:
-            return "cbl-java&&window"
-    }
-}
+// Builds 3.1.x or greater use windows 2016
+def static windowsNode(version) { return "cbl-java&&windows2016" }
 
-// check for pre- or post lithium build
-static boolean isNewWorkspace(version) {
-    String[] v = version.split("\\.")
-    if (v.length < 2) { throw new IllegalArgumentException("Bad version: ${version}") }
-
-    int majorVersion = v[0].toInteger()
-
-    return (majorVersion >= 3) || ((majorVersion == 2) && (v[1].toInteger >= 8))
-}
+// Builds 3.1.x or greater are all new workspace
+static boolean isNewWorkspace(version) { return true }
 
 static String getRootDir(ws, version) { return (!isNewWorkspace(version)) ? ws : "${ws}/cbl-java" }
 
