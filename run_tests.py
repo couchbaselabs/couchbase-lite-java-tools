@@ -1,7 +1,23 @@
+import argparse
 import os
 import time
-import argparse
-from subprocess import run, Popen
+from subprocess import run, Popen, PIPE
+
+# known devices: serial, name, relative speed
+KNOWN_DEVICES = {
+    "29131FDH3008JD":   ["Pixel_7_Pro", 1000],
+    "712KPKN1048861":   ["Pixel_2XL",    900],
+    "41020DLJH003HH":   ["Pixel_8",      850],
+    "14151JEC204776":   ["Pixel_4a",     830],
+    "2B141JEGR04407":   ["Pixel_6a",     800],
+    "RFCTA0AGBNF":      ["Galaxy_S20",   750],
+    "445356394a353498": ["Galaxy_S9",    700],
+    "R58T215CEEP":      ["Galaxy_A12",   500],
+    "LFKVVG6XW8XSKZRC": ["Redmi_9A",     650],
+    "ZX1G324JBJ":       ["Nexus_6",      600],
+    "0344242513ad68ab": ["Nexus_5",      500],
+    "004c03eb5615429f": ["Nexus_4",      500],
+}
 
 
 def test_java(project_root, out_dir):
@@ -19,26 +35,37 @@ def test_java(project_root, out_dir):
     """, shell=True, check=False)
 
 
+def get_android_devices():
+    adb = run(['adb', 'devices'], stdout=PIPE)
+    devs = list(filter(None, adb.stdout.decode("utf-8").split("\n")[1:]))
+    devs = list(map(lambda x: x.split("\t")[0].strip(), devs))
+    devs = list(map(lambda x: [x] + KNOWN_DEVICES[x], devs))
+    devs.sort(reverse=True, key=lambda x: x[2])
+    return devs
+
+
 def test_android(project_root, out_dir, devices):
     os.chdir(project_root)
 
-    for dev, dev_name in devices.items():
-        print(f"====== R U N N I N G   A N D R O I D   T E S T S:   {dev_name}")
+    for dev in devices:
+        dev_serial = dev[0]
+        dev_name = dev[1]
+        print(f"====== R U N N I N G   A N D R O I D   T E S T S:   {dev_name}({dev_serial})")
 
         # get rid of old test apps
         run(f"""
-            adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test.test
-            adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test
-            adb -s {dev} shell pm uninstall -k --user 0 com.couchbase.lite.test
-            adb -s {dev} logcat -G 1024K
+            adb -s {dev_serial} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test.test
+            adb -s {dev_serial} shell pm uninstall -k --user 0 com.couchbase.lite.kotlin.test
+            adb -s {dev_serial} shell pm uninstall -k --user 0 com.couchbase.lite.test
+            adb -s {dev_serial} logcat -G 1024K
         """, shell=True, check=False)
 
         # start logcat
-        logger = Popen(f"adb -s {dev} logcat > test.log", shell=True)
+        logger = Popen(f"adb -s {dev_serial} logcat > test.log", shell=True)
 
         # run the tests
         run(f"""
-            export ANDROID_SERIAL={dev}
+            export ANDROID_SERIAL={dev_serial}
             ./gradlew :ee:android-ktx:ee_android-ktx:devTest
         """, shell=True, check=False)
 
@@ -58,7 +85,7 @@ def test_android(project_root, out_dir, devices):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Analyze')
-    parser.add_argument('-v', '--version', choices=['helium', 'beryllium', 'boron'], help='Version code name')
+    parser.add_argument('-v', '--version', choices=['3_1', '3_2', '4_0'], help='Version code name')
     parser.add_argument('-o', '--output', default="/Users/blakemeike/Desktop")
     parser.add_argument('-a', '--android', action='store_true', help='Run android tests')
     parser.add_argument('-j', '--java', action='store_true', help='Run java tests')
@@ -78,14 +105,8 @@ if __name__ == "__main__":
         )
 
     if args.android:
+        devs = get_android_devices()
         test_android(
             f"/Users/blakemeike/Working/jak/{args.version}",
             args.output,
-            {
-                "41020DLJH003HH": "Pixel-8",
-                "14151JEC204776": "Pixel-4a",
-                "712KPKN1048861": "Pixel-2XL",
-                # "ZX1G324JBJ": "Nexus-6",
-                # "0344242513ad68ab": "Nexus-5",
-                "004c03eb5615429f": "Nexus-4"
-            })
+            devs)
