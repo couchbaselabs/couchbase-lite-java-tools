@@ -5,10 +5,22 @@
 // job couchbase-lite-java only for builds with versions 3.1.x or greater
 
 // These three methods set the tags that determine which agent will run a stage
-def static osxNode() { return "cbl-java&&macosx_x86_64" }
+def static osxNode(version) { return "cbl-java&&macosx_x86_64" }
 
 // Builds 3.1.x or greater use windows 2016
 def static windowsNode(version) { return "cbl-java&&windows2016" }
+
+// Builds 3.1.x use CentOS7.  For 3.2 and greater use ubuntu20
+def static linuxNode(version) {
+    switch (version) {
+        case ~/4\..+/:
+            return "cbl-java&&ubuntu20"
+        case ~/3\.2\..+/:
+            return "cbl-java&&ubuntu20"
+        default:
+            return "cbl-java&&centos73"
+    }
+}
 
 // Builds 3.1.x or greater are all new workspace
 static boolean isNewWorkspace(version) { return true }
@@ -36,7 +48,7 @@ static String pwd(credentials) { return credentials.split(":")[1] }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pipeline {
-    agent { label "cbl-java&&centos73" }
+    agent { label linuxNode("${VERSION}") }
     environment {
         LATESTBUILDS = "http://latestbuilds.service.couchbase.com/builds/latestbuilds"
         SOURCE = "couchbase-lite-java-${VERSION}-${BLD_NUM}-source.tar.gz"
@@ -122,7 +134,7 @@ echo "======== Linux: Check in `pwd`"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 stage('Build OSX') {
-                    agent { label osxNode() }
+                    agent { label osxNode("${VERSION}") }
                     environment {
                         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
                         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
@@ -412,7 +424,7 @@ mkdir -p "${ARTIFACTS_DIR}"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 stage('Test OSX') {
-                    agent { label osxNode() }
+                    agent { label osxNode("${VERSION}") }
                     environment {
                         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
                         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
