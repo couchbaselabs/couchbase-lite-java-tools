@@ -4,6 +4,9 @@
 // This build, couchbase-lite-java-linux-build-pipeline, is called from
 // job couchbase-lite-java only for builds with versions 3.1.x or greater
 
+// Root of the cbdep URL
+def CBDEP_ROOT = "https://packages.couchbase.com/cbdep/cbdep"
+
 // These three methods set the tags that determine which agent will run a stage
 def static osxNode(version) { return "cbl-java&&macosx_x86_64" }
 
@@ -45,6 +48,7 @@ pipeline {
         SOURCE = "couchbase-lite-java-${VERSION}-${BLD_NUM}-source.tar.gz"
         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+        CBDEP_URL="${CBDEP_ROOT}-linux-x86_64"
     }
     options {
         // ??? Doesn't work
@@ -76,7 +80,7 @@ rm -rf "${BIN_DIR}"
 mkdir -p "${BIN_DIR}"
 
 # install cbdeps and put it on the PATH
-curl https://packages.couchbase.com/cbdep/cbdep-linux-x86_64 -o "${BIN_DIR}/cbdep"
+curl "${CBDEP_URL}" -o "${BIN_DIR}/cbdep"
 chmod a+x "${BIN_DIR}/cbdep"
 PATH="${BIN_DIR}:${PATH}"
 
@@ -129,6 +133,7 @@ echo "======== Linux: Check in `pwd`"
                     environment {
                         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
                         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+                        CBDEP_URL="${CBDEP_ROOT}-darwin"
                     }
                     stages {
                         stage('OSX: Build') {
@@ -143,7 +148,7 @@ rm -rf "${BIN_DIR}"
 mkdir -p "${BIN_DIR}"
 
 # install cbdeps and put it on the PATH
-curl https://packages.couchbase.com/cbdep/cbdep-darwin-x86_64 -o "${BIN_DIR}/cbdep"
+curl "${CBDEP_URL}" -o "${BIN_DIR}/cbdep"
 chmod a+x "${BIN_DIR}/cbdep"
 PATH="${BIN_DIR}:${PATH}"
 
@@ -244,6 +249,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                     environment {
                         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
                         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+                        CBDEP_URL="${CBDEP_ROOT}-windows.exe"
                     }
                     stages {
                         stage('Win: Build') {
@@ -254,7 +260,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Install Java 17 on Windows Build Agent
                                 powershell '''
 Write-Host "======== Windows: Install Java 17"
-Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
+Invoke-Webrequest -Uri "$env:CBDEP_URL" -Outfile "cbdep.exe"
 .\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
 '''
                                 // Download the source
@@ -419,6 +425,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                     environment {
                         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
                         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+                        CBDEP_URL="${CBDEP_ROOT}-darwin"
                     }
                     stages {
                         stage('OSX: Test') {
@@ -433,7 +440,7 @@ rm -rf "${BIN_DIR}"
 mkdir -p "${BIN_DIR}"
 
 # install cbdeps and put it on the PATH
-curl https://packages.couchbase.com/cbdep/cbdep-darwin-x86_64 -o "${BIN_DIR}/cbdep"
+curl "${CBDEP_URL}" -o "${BIN_DIR}/cbdep"
 chmod a+x "${BIN_DIR}/cbdep"
 PATH="${BIN_DIR}:${PATH}"
 
@@ -508,6 +515,7 @@ mkdir -p "${REPORTS_DIR}"
                     environment {
                         CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
                         BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+                        CBDEP_URL="${CBDEP_ROOT}-windows.exe"
                     }
                     stages {
                         stage('Win: Test') {
@@ -518,7 +526,7 @@ mkdir -p "${REPORTS_DIR}"
                                  // Install Java 17 on Windows Test Agent
                                 powershell '''
 Write-Host "======== Windows: Install Java 17"
-Invoke-Webrequest -Uri "http://downloads.build.couchbase.com/cbdep/cbdep.windows-x86_64.exe" -Outfile "cbdep.exe"
+Invoke-Webrequest -Uri "$env:CBDEP_URL" -Outfile "cbdep.exe"
 .\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
 '''
                                 // Download the source
