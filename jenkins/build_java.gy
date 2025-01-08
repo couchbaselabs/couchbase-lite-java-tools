@@ -260,6 +260,7 @@ mkdir -p "${ARTIFACTS_DIR}"
                                 // Install Java 17 on Windows Build Agent
                                 powershell '''
 Write-Host "======== Windows: Install Java 17"
+[Net.ServicePointManager]::SecurityProtocol = "Tls12, Ssl3"
 Invoke-Webrequest -Uri "$env:CBDEP_URL" -Outfile "cbdep.exe"
 .\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
 '''
@@ -523,9 +524,10 @@ mkdir -p "${REPORTS_DIR}"
                                 // Clean the workspace
                                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
 
-                                 // Install Java 17 on Windows Test Agent
+                                // Install Java 17 on Windows Test Agent
                                 powershell '''
 Write-Host "======== Windows: Install Java 17"
+[Net.ServicePointManager]::SecurityProtocol = "Tls12, Ssl3"
 Invoke-Webrequest -Uri "$env:CBDEP_URL" -Outfile "cbdep.exe"
 .\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
 '''
