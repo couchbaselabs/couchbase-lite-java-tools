@@ -1,0 +1,313 @@
+//
+//  Pipeline build for Java product
+//
+// This build, couchbase-lite-java-linux-build-pipeline, is called from
+// job couchbase-lite-java only for builds with versions 3.1.x or greater
+
+// Root of the cbdep URL
+def CBDEP_ROOT = "https://packages.couchbase.com/cbdep/cbdep"
+
+// These three methods set the tags that determine which agent will run a stage
+def static osxNode(version) { return "cbl-java&&macosx_x86_64" }
+
+// Builds 3.1.x or greater use windows 2016
+def static windowsNode(version) { return "cbl-java&&windows2016" }
+
+// For now, all builds use CentOS7.
+def static linuxNode(version) { return "cbl-java&&centos73" }
+
+static String getRootDir(ws, version) { return "${ws}/cbl-java" }
+
+static String getBuildDir(rootDir, version, edition) {
+    switch (edition) {
+        case 'enterprise':
+            return "${rootDir}/ee/java"
+        case 'community':
+            return "${rootDir}/ce/java"
+        default:
+            throw new IllegalArgumentException("Bad edition: ${edition}")
+    }
+}
+
+static String uName(credentials) { return credentials.split(":")[0] }
+static String pwd(credentials) { return credentials.split(":")[1] }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////   BUILD PIPELINE   /////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+pipeline {
+    agent { label linuxNode("${VERSION}") }
+    environment {
+        LATESTBUILDS = "http://latestbuilds.service.couchbase.com/builds/latestbuilds"
+        SOURCE = "couchbase-lite-java-${VERSION}-${TEST_SOURCE_BUILD}-source.tar.gz"
+        CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
+        BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+        CBDEP_URL="${CBDEP_ROOT}-linux-x86_64"
+    }
+    options {
+        skipDefaultCheckout(true)
+        timeout(time: 2, unit: 'HOURS') 
+    }
+    stages {
+        stage('Set build name') {
+            steps {
+                script { currentBuild.displayName = "verify-release-${VERSION}-${EDITION}-${BUILD_NUMBER}" }
+            }
+        }
+
+        stage('Platform Tests') {
+            parallel {
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////   O S X   T E S T   //////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                stage('Test OSX') {
+                    agent { label osxNode("${VERSION}") }
+                    environment {
+                        CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
+                        BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+                        CBDEP_URL="${CBDEP_ROOT}-darwin"
+                    }
+                    stages {
+                        stage('OSX: Test') {
+                            steps {
+                                // Clean the workspace
+                                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
+
+                                // Install Java 17 on OSX Test Agent
+                                sh '''#!/bin/bash
+export BIN_DIR="${WORKSPACE}/bin"
+rm -rf "${BIN_DIR}"
+mkdir -p "${BIN_DIR}"
+
+# install cbdeps and put it on the PATH
+curl "${CBDEP_URL}" -o "${BIN_DIR}/cbdep"
+chmod a+x "${BIN_DIR}/cbdep"
+PATH="${BIN_DIR}:${PATH}"
+
+# install openjdk 17
+cbdep install -d "${BIN_DIR}" openjdk 17.0.7+7
+'''
+
+                                // Download the source
+                                sh '''#!/bin/bash
+echo "======== OSX: Download source: ${SOURCE}"
+curl -LO "${LATESTBUILDS}/couchbase-lite-java/${VERSION}/${TEST_SOURCE_BUILD}/${SOURCE}"
+
+echo "======== OSX: Extract source"
+tar xzf ${SOURCE}
+rm *-source.tar.gz
+
+echo "======== OSX: Force version ${VERSION}"
+echo "${VERSION}" > "${CBL_ROOT}/version.txt"
+'''
+
+                                // Run the tests
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                                sh '''#!/bin/bash
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
+export PATH="${JAVA_HOME}/bin:$PATH"
+
+cd "${BUILD_DIR}"
+
+touch "local.properties"
+
+echo "======== OSX: Test in `pwd`"
+REPORTS_DIR="$WORKSPACE/reports"
+rm -rf "${REPORTS_DIR}"
+mkdir -p "${REPORTS_DIR}"
+
+./etc/jenkins/test_macos.sh "RELEASE"  "${REPORTS_DIR}" || exit $?
+'''
+                                }
+
+                                // Upload test logs
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    sshPublisher(
+                                        continueOnError: true,
+                                        failOnError: false,
+                                        publishers: [
+                                            sshPublisherDesc(
+                                                configName: "latestbuilds",
+                                                verbose: true,
+                                                transfers: [
+                                                    sshTransfer(
+                                                        sourceFiles: "reports/*.zip",
+                                                        removePrefix: "reports",
+                                                        remoteDirectory: "couchbase-lite-java/${VERSION}/release/${BUILD_NUMBER}",
+                                                        execCommand: ""
+                                                    )
+                                                ])
+                                        ]
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////   W I N D O W S   T E S T   //////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                stage('Test Windows') {
+                    agent { label windowsNode("${VERSION}") }
+                    environment {
+                        CBL_ROOT = getRootDir("${WORKSPACE}", "${VERSION}")
+                        BUILD_DIR = getBuildDir("${CBL_ROOT}", "${VERSION}", "${EDITION}")
+                        CBDEP_URL="${CBDEP_ROOT}-windows.exe"
+                    }
+                    stages {
+                        stage('Win: Test') {
+                            steps {
+                                // Clean the workspace
+                                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
+
+                                // Install Java 17 on Windows Test Agent
+                                powershell '''
+Write-Host "======== Windows: Install Java 17"
+[Net.ServicePointManager]::SecurityProtocol = "Tls12, Ssl3"
+Invoke-Webrequest -Uri "$env:CBDEP_URL" -Outfile "cbdep.exe"
+.\\cbdep.exe install -d $env:WORKSPACE openjdk 17.0.7+7
+'''
+                                // Download the source
+                                powershell '''
+Write-Host "======== Windows: Download source"
+try { (New-Object Net.WebClient).DownloadFile("$env:LATESTBUILDS/couchbase-lite-java/$env:VERSION/$env:TEST_SOURCE_BUILD/$env:SOURCE", "source.tar.gz") }
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
+}
+
+Write-Host "======== Windows: Extract source"
+7z x source.tar.gz
+Remove-Item $env:SOURCE -Force -ErrorAction SilentlyContinue
+7z x -y source.tar
+Remove-Item source.tar -Force -ErrorAction SilentlyContinue
+
+Write-Host "======== Windows: Force version" $env:VERSION
+Set-Content "$env:CBL_ROOT\\version.txt" -Value "$env:VERSION"
+'''
+
+                                // Run the tests
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                                powershell '''
+$env:JAVA_HOME = "$env:WORKSPACE\\openjdk-17.0.7+7"
+$env:PATH = "$env:JAVA_HOME\\bin;$env:PATH"
+
+try { Set-Location $env:BUILD_DIR }
+catch {
+    Write-Host "Failed with error" $_.Exception.toString()
+    Exit 5
+}
+
+New-Item ".\\local.properties"
+
+Write-Host "======== Windows: Test"
+New-Item -ItemType "directory" -Path "$env:WORKSPACE\\reports"
+
+& $env:BUILD_DIR\\etc\\jenkins\\test_windows.ps1 -buildNumber "RELEASE"-reportsDir "$env:WORKSPACE\\reports"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Failed with error" $LASTEXITCODE
+    Exit 5
+}
+'''
+                                }
+
+                                // Upload test logs
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    sshPublisher(
+                                        continueOnError: true,
+                                        failOnError: false,
+                                        publishers: [
+                                            sshPublisherDesc(
+                                                configName: "latestbuilds",
+                                                verbose: true,
+                                                transfers: [
+                                                    sshTransfer(
+                                                        sourceFiles: "reports/*.zip",
+                                                        removePrefix: "reports",
+                                                        remoteDirectory: "couchbase-lite-java/${VERSION}/release/${BUILD_NUMBER}",
+                                                        execCommand: ""
+                                                    )
+                                                ])
+                                        ]
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////   L I N U X   T E S T   //////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // It would be great if we could run this stage in parallel.
+        // If it explicitly requests an agent, it deadlocks this job.
+        // I wonder if it were in the parallel clause, but didn't have
+        // an agent specifier, it would run on the current agent...
+        stage('Linux: Test') {
+            steps {
+                // Run the tests
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                    sh '''#!/bin/bash
+export JAVA_HOME="${WORKSPACE}/bin/openjdk-17.0.7+7"
+export PATH="${JAVA_HOME}/bin:$PATH"
+
+cd "${BUILD_DIR}"
+
+echo "======== Linux: Test in `pwd`"
+REPORTS_DIR="$WORKSPACE/reports"
+rm -rf "${REPORTS_DIR}"
+mkdir -p "${REPORTS_DIR}"
+
+./etc/jenkins/test_linux.sh "RELEASE" "${REPORTS_DIR}" || exit $?
+'''
+                }
+
+                // Upload test logs
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sshPublisher(
+                        continueOnError: true,
+                        failOnError: false,
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: "latestbuilds",
+                                verbose: true,
+                                transfers: [
+                                    sshTransfer(
+                                        sourceFiles: "reports/*.zip",
+                                        removePrefix: "reports",
+                                        remoteDirectory: "couchbase-lite-java/${VERSION}/release/${BUILD_NUMBER}",
+                                        execCommand: ""
+                                    )
+                                ])
+                        ]
+                    )
+                }
+            }
+        }
+    }
+
+    post {
+        unstable {
+            mail to: 'mobile_dev_java@couchbase.com',
+                subject: "Java build is unstable",
+                body: "JAVA build ${VERSION}-${EDITION}-release is unstable"
+        }
+        failure {
+            mail to: 'mobile_dev_java@couchbase.com',
+                subject: "Java build failed",
+                body: "JAVA build ${VERSION}-${EDITION}-release} failed"
+        }
+    }
+}
