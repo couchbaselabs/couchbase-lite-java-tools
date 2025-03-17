@@ -7,9 +7,9 @@
 #    ANDROID_HOME - the root of the android sdk.
 
 # These versions must match the versions in lib/build.gradle
-BUILD_TOOLS_VERSION='34.0.0'
-NDK_VERSION='25.1.8937393'
-NINJA_VERSION="1.10.2"
+BUILD_TOOLS_VERSION='36.0.0'
+NDK_VERSION='29.0.13113456'
+NINJA_VERSION='1.10.2'
 CMAKE_VERSION='3.25.0'
 
 cbdep install -d "${BIN_DIR}" ninja ${NINJA_VERSION}
