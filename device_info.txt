@@ -7,7 +7,7 @@ If you make changes to this file, please update that page as well.
 
 
 
-################ SANTA CLARA
+################ SANTA CLARA: Dev test
 
 =============== Google Pixel 6a: 2022/7
 Couchbase
@@ -18,6 +18,37 @@ https://www.gsmarena.com/google_pixel_6a-11229.php
 [ro.product.name]: [bluejay]
 [ro.hardware]: [bluejay]
 [ro.build.version.sdk]: [33]
+
+=============== Samsung Galaxy S9: 2025/3
+Couchbase
+https://www.gsmarena.com/samsung_galaxy_s9-8966.php
+[ro.serialno]: [3333483258543398]
+[ro.product.manufacturer]: [samsung]
+[ro.product.model]: [SM-G960U]
+[ro.product.name]: [starqltesq]
+[ro.hardware]: [qcom]
+[ro.build.version.sdk]: [29]
+
+=============== Google Pixel 7a: 2025/3
+Couchbase
+https://www.gsmarena.com/google_pixel_7a-12170.php
+[ro.serialno]: [3C071JEHN13671]
+[ro.product.manufacturer]: [Google]
+[ro.product.model]: [Pixel 7a]
+[ro.product.name]: [lynx]
+[ro.hardware]: [lynx]
+[ro.build.version.sdk]: [34]
+
+=============== Samsung Galaxy A12:2025/3
+Couchbase
+https://www.gsmarena.com/samsung_galaxy_a12-10604.php
+[ro.serialno]: [R58RA0NYB2K]
+[ro.product.manufacturer]: [samsung]
+[ro.product.model]: [SM-A125U]
+[ro.product.name]: [a12usq] 
+[ro.hardware]: [mt6765]
+[ro.hardware.chipname]: [MT6765]
+[ro.build.version.sdk]: [30]
 
 =============== Samsung Galaxy S20: 2020/10
 Couchbase
@@ -30,27 +61,29 @@ https://www.gsmarena.com/samsung_galaxy_s20_fe_5g-10377.php
 [ro.hardware.chipname]: [SM8250]
 [ro.build.version.sdk]: [31 (32)]
 
-=============== Samsung Galaxy A12: 2020/12
-Couchbase
-https://www.gsmarena.com/samsung_galaxy_a12-10604.php
-[ro.serialno]: [R58T215CEEP]
-[ro.product.manufacturer]: [samsung]
-[ro.product.model]: [SM-A125U1]
-[ro.product.name]: [a12uue]
-[ro.hardware]: [mt6765]
-[ro.hardware.chipname]: [MT6765]
-[ro.build.version.sdk]: [31 (30!)]
 
-=============== Samsung Galaxy S9: 2018/03
+################ SANTA CLARA: E2E Test
+
+================ Google Pixel 4XL: 2025/3
 Couchbase
-https://www.gsmarena.com/samsung_galaxy_s9-8966.php
-[ro.serialno]: [445356394a353498]
+https://www.gsmarena.com/google_pixel_4_xl-9895.php
+[ro.serialno]: [1BCACS00001MX3]
+[ro.product.manufacturer]: [Google]
+[ro.product.model]: [Pixel 4 XL]
+[ro.product.name]: [coral]
+[ro.hardware]: [coral]
+[ro.build.version.sdk]: [33]
+
+=============== Samsung Galaxy S25: 2025/3
+Couchbase
+https://www.gsmarena.com/samsung_galaxy_s25-13610.php
+[ro.serialno]: [RFCY217B0CA]
 [ro.product.manufacturer]: [samsung]
-[ro.product.model]: [SM-G960U1]
-[ro.product.name]: [starqlteue]
+[ro.product.manufacturer]: [samsung]
+[ro.product.model]: [SM-S931U1]
+[ro.product.name]: [pa1quew]
 [ro.hardware]: [qcom]
-[ro.hardware.chipname]: [SDM845]
-[ro.build.version.sdk]: [29 (29)]
+[ro.build.version.sdk]: [35]
 
 
 ################ OLYMPIA
@@ -144,3 +177,29 @@ Battery: 3.85
 [ro.product.name]: [occam]
 [ro.hardware]: [mako]
 [ro.build.version.sdk]: [22 (22)]
+
+
+################ DEFUNCT
+
+=============== Samsung Galaxy A12: 2020/12
+Couchbase
+https://www.gsmarena.com/samsung_galaxy_a12-10604.php
+[ro.serialno]: [R58T215CEEP]
+[ro.product.manufacturer]: [samsung]
+[ro.product.model]: [SM-A125U1]
+[ro.product.name]: [a12uue]
+[ro.hardware]: [mt6765]
+[ro.hardware.chipname]: [MT6765]
+[ro.build.version.sdk]: [31 (30!)]
+
+=============== Samsung Galaxy S9: 2018/03
+Couchbase
+https://www.gsmarena.com/samsung_galaxy_s9-8966.php
+[ro.serialno]: [445356394a353498]
+[ro.product.manufacturer]: [samsung]
+[ro.product.model]: [SM-G960U1]
+[ro.product.name]: [starqlteue]
+[ro.hardware]: [qcom]
+[ro.hardware.chipname]: [SDM845]
+[ro.build.version.sdk]: [29 (29)]
+

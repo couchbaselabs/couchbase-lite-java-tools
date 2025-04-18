@@ -8,7 +8,7 @@
 
 # These versions must match the versions in lib/build.gradle
 BUILD_TOOLS_VERSION='36.0.0'
-NDK_VERSION='29.0.13113456'
+NDK_VERSION='28.0.13004108'
 NINJA_VERSION='1.10.2'
 CMAKE_VERSION='3.25.0'
 
