@@ -11,7 +11,7 @@ def CBDEP_ROOT = "https://packages.couchbase.com/cbdep/cbdep"
 def static osxNode(version) { return "cbl-java&&macosx_x86_64" }
 
 // Builds 3.1.x or greater use windows 2016
-def static windowsNode(version) { return "cbl-java&&windows2022" }
+def static windowsNode(version) { return "mobile-shared-windows2022-01" }
 
 // For now, all builds use CentOS7.
 def static linuxNode(version) { return "cbl-java&&centos73" }
