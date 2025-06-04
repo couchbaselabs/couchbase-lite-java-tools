@@ -85,7 +85,7 @@ def test_android(project_root, out_dir, devices):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Analyze')
-    parser.add_argument('-v', '--version', choices=['3_1', '3_2', '4_0'], help='Version code name')
+    parser.add_argument('-v', '--version', choices=['3_1', '3_2', '3_3', '4_0'], help='Version code name')
     parser.add_argument('-o', '--output', default="/Users/blakemeike/Desktop")
     parser.add_argument('-a', '--android', action='store_true', help='Run android tests')
     parser.add_argument('-j', '--java', action='store_true', help='Run java tests')
