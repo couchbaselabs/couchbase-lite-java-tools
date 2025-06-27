@@ -7,6 +7,10 @@
 #    ANDROID_HOME - the root of the android sdk.
 
 # These versions must match the versions in lib/build.gradle
+## Should update to at least:
+# BUILD_TOOLS_VERSION='36.0.0'
+# NDK_VERSION='28.0.13004108'
+# CMAKE_VERSION='3.30.3
 BUILD_TOOLS_VERSION='34.0.0'
 NDK_VERSION='25.1.8937393'
 NINJA_VERSION="1.10.2"
