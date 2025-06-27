@@ -1,0 +1,31 @@
+JAK release 3.2.4 Minor release candidate RC-1 is ready.
+
+Changes since 3.2.3:
+
+    * Recalibrate flaky tests
+    * Fix offlineHandler
+    * Fix certificate locality DN
+    * Clarify the location of JUnit the assert methods.
+    * update LiteCore to 3.2.4-2
+    * versionCode 3.2.4
+
+All dev and E2E tests passed with the following exceptions:
+
+  QueryTest.testStringToUTC which failed on two of three Android devices.  This is a testing issue caused by a disagreement between two libraries on the test device about what UTC means.
+
+  Several Load tests failed on the slowest Android device.
+
+All artifacts (except the Linux support libs) are on the internal maven server: https://proget.sc.couchbase.com/maven2/internalmaven/
+
+=== Java
+CE: implementation 'com.couchbase.lite:couchbase-lite-java:3.2.2-21'
+EE: implementation 'com.couchbase.lite:couchbase-lite-java-ee:3.2.2-21'
+Support libs: https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-java/3.2.2/21/couchbase-lite-java-linux-supportlibs-3.2.2-21.zip
+
+=== Android
+CE: implementation ‘com.couchbase.lite:couchbase-lite-android:3.2.2-21’
+EE: implementation ‘com.couchbase.lite:couchbase-lite-android-ee:3.2.2-21’
+
+=== Android Kotlin Extensions
+CE: implementation 'com.couchbase.lite:couchbase-lite-android-ktx:3.2.2-21’
+EE: implementation 'com.couchbase.lite:couchbase-lite-android-ee-ktx:3.2.2-21’
