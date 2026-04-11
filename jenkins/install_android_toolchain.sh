@@ -7,7 +7,7 @@
 #    ANDROID_HOME - the root of the android sdk.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VERSIONS_TOML="${SCRIPT_DIR}/../../ee/android/gradle/libs.versions.toml"
+VERSIONS_TOML="${SCRIPT_DIR}/../../gradle/libs.versions.toml"
 NINJA_VERSION="1.10.2"
 
 if ! command -v yq >/dev/null 2>&1; then
