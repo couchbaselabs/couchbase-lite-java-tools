@@ -28,8 +28,16 @@ def static windowsNode(version) {
     }
 }
 
-// For now, all builds use CentOS7.
-def static linuxNode(version) { return "cbl-java&&centos73" }
+// Builds before 3.4 and 4.1 use CentOS 7; 3.4.x and 4.1.x or greater use Ubuntu 20.
+def static linuxNode(version) {
+    switch (version) {
+        case ~/3\.[0123].*/:
+        case ~/4\.0.*/:
+            return "cbl-java&&centos73"
+        default:
+            return "cbl-java&&ubuntu20"
+    }
+}
 
 // Builds 3.1.x or greater are all new workspace
 static boolean isNewWorkspace(version) { return true }
