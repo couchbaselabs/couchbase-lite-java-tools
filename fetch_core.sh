@@ -7,5 +7,5 @@ TOOLS_DIR="${SCRIPT_DIR}/jenkins"
 rm -rf "${COMMON_DIR}/lite-core"
 
 "${TOOLS_DIR}/fetch_core.sh" -d -e EE -p android
-"${TOOLS_DIR}/fetch_core.sh" -d -e EE 
+"${TOOLS_DIR}/fetch_core.sh" -e EE 
 
