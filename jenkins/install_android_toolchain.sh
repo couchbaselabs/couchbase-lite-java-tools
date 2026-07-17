@@ -12,6 +12,10 @@ NDK_VERSION='25.1.8937393'
 NINJA_VERSION="1.10.2"
 CMAKE_VERSION='3.25.0'
 
+# NDK r23b: matches the NDK that builds libLiteCore.so, needed to source the ASan runtime
+# and libc++_shared.so for the android_asan lib module's instrumented tests.
+NDK_VERSION_ASAN='23.1.7779620'
+
 cbdep install -d "${BIN_DIR}" ninja ${NINJA_VERSION}
 NINJA_DIR=`echo "${BIN_DIR}"/ninja-*`
 PATH="${NINJA_DIR}/bin:${PATH}"
@@ -23,8 +27,9 @@ PATH="${CMAKE_DIR}/bin:${PATH}"
 # !!! Workaround for a dumb bug in the AGP
 ln -s "${NINJA_DIR}/bin/ninja" "${CMAKE_DIR}/bin/ninja"
 
-SDK_MGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --channel=1"
-yes | ${SDK_MGR} --licenses > /dev/null 2>&1
-${SDK_MGR} --install "build-tools;${BUILD_TOOLS_VERSION}"
-${SDK_MGR} --install "ndk;${NDK_VERSION}"
+SDK_MGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+yes | ${SDK_MGR} --channel=1 --licenses > /dev/null 2>&1
+${SDK_MGR} --channel=1 --install "build-tools;${BUILD_TOOLS_VERSION}"
+${SDK_MGR} --channel=1 --install "ndk;${NDK_VERSION}"
+${SDK_MGR} --channel=1 --install "ndk;${NDK_VERSION_ASAN}"
 
