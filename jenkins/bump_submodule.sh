@@ -13,8 +13,9 @@
 #
 # Works entirely through the GitHub API, so it needs no checkout or SSH key,
 # only `gh` logged in to the account it acts as. Safe to run on a schedule:
-# it does nothing when the submodule is current or the open PR already is,
-# and doesn't raise again a bump that was closed without merging.
+# it does nothing when the open PR is already current, doesn't raise again a
+# bump that was closed without merging, and once the submodule is current
+# (e.g. after a manual bump) closes the leftover bump PR and deletes its branch.
 #
 set -euo pipefail
 
@@ -78,8 +79,45 @@ if [ "$rc" -eq 2 ]; then
 fi
 [ "$rc" -eq 0 ] || exit 1
 
+head_branch="bump/$SUB-${BASE//\//-}"
+
+rc=0
+branch_sha=$(gh_api_404 "repos/$ROOT_REPO/git/ref/heads/$head_branch" -q .object.sha) || rc=$?
+case "$rc" in
+    0) ;;
+    2) branch_sha="" ;;
+    *) exit 1 ;;
+esac
+
+open_pr=$(gh pr list --repo "$ROOT_REPO" --head "$head_branch" --base "$BASE" --state open --json url \
+    -q '.[0].url // ""' 2>"$err_file") \
+    || die "can't list open bump PRs: $(cat "$err_file")"
+
+# Deletes the bump branch, if there is one. Only this script uses it.
+delete_bump_branch() {
+    [ -n "$branch_sha" ] || return 0
+    if $DRY_RUN; then
+        echo "Dry run: would delete $head_branch"
+    else
+        gh api -X DELETE "repos/$ROOT_REPO/git/refs/heads/$head_branch" >/dev/null 2>"$err_file" \
+            || die "couldn't delete $head_branch: $(cat "$err_file")"
+        echo "Deleted $head_branch"
+    fi
+}
+
 if [ "$old" = "$new" ]; then
     echo "$SUB on $BASE is up to date (${old:0:8})"
+    # Someone else brought it up to date, e.g. with a manual bump. An open bump
+    # PR is now stale, and merging it would move the submodule back.
+    if [ -n "$open_pr" ]; then
+        if $DRY_RUN; then
+            echo "Dry run: would close $open_pr"
+        else
+            gh pr close "$open_pr" --comment "\`$SUB\` on \`$BASE\` already points at ${new:0:8}." >/dev/null
+            echo "Closed $open_pr"
+        fi
+    fi
+    delete_bump_branch
     exit 0
 fi
 
@@ -102,18 +140,7 @@ echo
 echo "$body"
 echo
 
-head_branch="bump/$SUB-${BASE//\//-}"
 base_sha=$(gh api "repos/$ROOT_REPO/git/ref/heads/$BASE" -q .object.sha)
-
-# An existing bump branch that already sits on the current base and points
-# at the new commit needs nothing; don't push again and re-trigger CI.
-rc=0
-branch_sha=$(gh_api_404 "repos/$ROOT_REPO/git/ref/heads/$head_branch" -q .object.sha) || rc=$?
-case "$rc" in
-    0) ;;
-    2) branch_sha="" ;;
-    *) exit 1 ;;
-esac
 
 # A bump to this commit that someone closed without merging was declined;
 # don't raise it again every day. A newer submodule commit raises a new PR.
@@ -122,12 +149,12 @@ declined=$(gh pr list --repo "$ROOT_REPO" --head "$head_branch" --base "$BASE" -
     || die "can't list closed bump PRs: $(cat "$err_file")"
 if [ "$declined" -gt 0 ]; then
     echo "A bump of $SUB to ${new:0:8} on $BASE was closed without merging, skipping"
+    [ -n "$open_pr" ] || delete_bump_branch
     exit 0
 fi
 
-open_pr=$(gh pr list --repo "$ROOT_REPO" --head "$head_branch" --base "$BASE" --state open --json url \
-    -q '.[0].url // ""' 2>"$err_file") \
-    || die "can't list open bump PRs: $(cat "$err_file")"
+# An existing bump branch that already sits on the current base and points
+# at the new commit needs nothing; don't push again and re-trigger CI.
 if [ -n "$branch_sha" ] && [ -n "$open_pr" ]; then
     parent=$(gh api "repos/$ROOT_REPO/commits/$branch_sha" -q '.parents[0].sha')
     linked=$(gh api "repos/$ROOT_REPO/contents/$SUB?ref=$branch_sha" -q .sha)
